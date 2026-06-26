@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ServiceCatalog
+    participant CatalogDB
+
+    User           ->>  ServiceCatalog      :   HTTP PATCH http://service-catalog.com/api/v1/borrow <br/>BorrowBookRequest
+    ServiceCatalog ->> CatalogDB            :   findBookById
+    alt Not Found
+        CatalogDB -->> ServiceCatalog       :   Null
+        ServiceCatalog -->> User            :   HTTP 404 Not Found
+    else BookEntity
+        CatalogDB -->> ServiceCatalog       :   BookEntity
+        ServiceCatalog ->> ServiceCatalog   :   Check Borrow Status
+        alt Wrong Status
+            ServiceCatalog -->> User        :   HTTP 409 Conflict
+        else Correct Status
+            ServiceCatalog ->>  CatalogDB   :   update borrow status
+            CatalogDB      -->> ServiceCatalog : ok
+            ServiceCatalog -->> User        :   HTTP 200 OK BorrowBookResponse
+        end
+    end

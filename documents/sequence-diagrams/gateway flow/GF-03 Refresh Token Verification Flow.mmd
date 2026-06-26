@@ -1,0 +1,20 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Gateway
+    participant Redis
+    participant ServiceAuth
+
+    User            ->>  Gateway        :   HTTP POST http://server-gateway/refresh <br/>RefreshTokenRequest
+    Gateway         ->>  Gateway        :   verify Refresh Token signature with cached public key
+    alt Unsuccessfull
+        Gateway     -->> User           :   HTTP 401 Unauthorized
+    else Successfull
+        Gateway     ->>  Redis          :   GET blacklist:{refreshToken}
+        Redis       -->> Gateway        :   result
+        alt Refresh Token in BlackList
+            Gateway -->> User           :   HTTP 401 Unauthorized
+        else Not Found
+            Gateway ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/auth/refresh <br/>RefreshTokenRequest
+        end
+    end

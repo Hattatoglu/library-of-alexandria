@@ -1,0 +1,11 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Nginx
+    participant Gateway
+
+    User            ->>  Nginx          :   HTTP GET http://libofalex.com/searchbook <br/>(with Access Token)
+    Nginx           ->>  Gateway        :   HTTP GET http://server-gateway/api/v1/auth/verify <br/>(with Access Token)
+    Note over Gateway: REF: GF-02 Access Token Verification Flow
+    Gateway         -->> Nginx          :   HTTP 200 OK
+    Nginx           -->> User           :   HTTP 200 OK searchbook.html

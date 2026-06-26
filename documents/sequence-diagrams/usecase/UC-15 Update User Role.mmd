@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    actor SuperUser
+    participant Nginx
+    participant Gateway
+    participant ServiceAuth
+
+    Note over SuperUser,ServiceAuth: Super user has already been on provision.html page<br/>REF: UC-13 Loading provision page
+    Note over SuperUser: Super user has already search user with username<br/>REF: UC-14 Search User
+    SuperUser       ->>  Nginx          :   HTTP PATCH http://libofalex.com/updateuserrole (with Access Token) <br/>UpdateRoleRequest
+    Nginx           ->>  Gateway        :   HTTP PATCH http://server-gateway/updateuserrole (with Access Token) <br/>UpdateRoleRequest
+    Gateway         ->>  Gateway        :   verify signature and role
+    alt Unsuccessfull
+        Gateway     -->> Nginx          :   HTTP 401 Unauthorized
+        Nginx       -->> SuperUser      :   HTTP 401 Unauthorized
+    else Successfull
+        Gateway     ->>  ServiceAuth    :   HTTP PATCH http://service-auth/api/v1/roles <br/>UpdateRoleRequest
+        Note over ServiceAuth: REF: SF-05 Update User Role Flow
+        ServiceAuth -->> Gateway        :   HTTP 200 OK UpdateRoleResponse
+        Gateway     -->> Nginx          :   HTTP 200 OK UpdateRoleResponse
+        Nginx       -->> SuperUser      :   HTTP 200 OK UpdateRoleResponse
+    end

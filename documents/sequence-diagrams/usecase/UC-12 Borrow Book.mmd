@@ -1,0 +1,23 @@
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant Nginx
+    participant Gateway
+    participant ServiceBook
+
+    Note over Admin,ServiceBook : User has already logged in.<br/>REF: UC-05 Login user
+    Note over Admin: User has already been borrowbook.html on page<br/>REF: UC-11 Loading borrowbook page
+
+    Admin           ->>  Nginx          :   HTTP PATCH http://libofalex.com/borrowbook<br/>BorrowBookRequest
+    Nginx           ->>  Gateway        :   HTTP PATCH http://server-gateway/borrwbook<br/>BorrowBookRequest
+    Gateway         ->>  Gateway        :   User has Admin Role
+    alt Unsuccessfull
+        Gateway     -->> Nginx          :   HTTP 401 Unauthorized
+        Nginx       -->> Admin          :   HTTP 401 Unauthorized
+    else Successfull
+        Gateway     ->>  ServiceCatalog :   HTTP PATCH http://service-catalog.com/api/v1/borrow <br/>BorrowBookRequest
+        Note over ServiceCatalog: REF: BF-01 Borrow Book Flow
+        ServiceCatalog -->> Gateway     :   HTTP 200 OK BorrowBookResponse
+        Gateway     -->>  Nginx         :   HTTP 200 OK BorrowBookResponse
+        Nginx       -->>  Admin         :   HTTP 200 OK BorrowBookResponse
+    end

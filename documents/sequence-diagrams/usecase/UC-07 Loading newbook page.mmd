@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant Nginx
+    participant Gateway
+
+    Note over Admin,Gateway: Admin has already logged in.
+
+    Admin           ->>  Nginx          :   HTTP GET http://libofalex.com/newbook
+    Nginx           ->>  Gateway        :   HTTP GET http://server-gateway/api/v1/auth/verify/hasRole?=<<UserRole>> <br/>(with Access Token)
+    Note over Gateway: REF: GF-05 User Role Verification Flow
+    Gateway         -->> Nginx          :   HTTP 200 OK
+    Nginx           -->> Admin          :   HTTP 200 OK newbook.html

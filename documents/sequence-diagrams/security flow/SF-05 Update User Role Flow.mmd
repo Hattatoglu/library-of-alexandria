@@ -1,0 +1,18 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ServiceAuth
+    participant AuthDB
+
+    User             ->>  ServiceAuth   :   HTTP PATCH http://service-auth/api/v1/roles <br/>UpdateRoleRequest
+    ServiceAuth      ->>  AuthDB        :   find AuthEntity by username
+    alt Not Found
+        AuthDB       -->> ServiceAuth   :   Null
+        ServiceAuth  -->> User          :   HTTP 404 Not Found
+    else Found
+        AuthDB       -->> ServiceAuth   :   AuthEntity
+        ServiceAuth  ->>  ServiceAuth   :   update role
+        ServiceAuth  ->>  AuthDB        :   save AuthEntity
+        AuthDB       -->> ServiceAuth   :   ok
+        ServiceAuth  -->> User          :   HTTP 200 OK UpdateRoleResponse
+    end

@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    actor SuperUser
+    participant Nginx
+    participant Gateway
+    participant ServiceAuth
+
+    Note over SuperUser,ServiceAuth: Super user has already logged in.<br/>REF: UC-05 Login user
+    Note over SuperUser: Super user has already been on provision.html page<br/>REF: UC-13 Loading provision page
+    SuperUser       ->>  Nginx          :   HTTP GET http://libofalex.com/searchuser?username=<<username>> (with Access Token)
+    Nginx           ->>  Gateway        :   HTTP GET http://server-gateway/searchuser?username=<<username>> <br/>(with Access Token)
+    Gateway         ->>  Gateway        :   verify signature and role
+    alt Unsuccessfull
+        Gateway     -->> Nginx          :   HTTP 401 Unauthorized
+        Nginx       -->> SuperUser      :   HTTP 401 Unauthorized
+    else Successfull
+        Gateway     ->>  ServiceAuth    :   HTTP GET http://service-auth/api/v1/users/searchuser?username=<<username>>
+        Note over ServiceAuth: REF: SF-04 View User Flow
+        ServiceAuth -->> Gateway        :   HTTP 200 OK ViewUserResponse
+        Gateway     -->> Nginx          :   HTTP 200 OK ViewUserResponse
+        Nginx       -->> SuperUser      :   HTTP 200 OK ViewUserResponse
+    end

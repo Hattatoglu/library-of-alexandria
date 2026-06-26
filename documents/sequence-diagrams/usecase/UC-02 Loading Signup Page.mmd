@@ -1,0 +1,7 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Nginx
+
+    User            ->>  Nginx          :   HTTP GET http://libofalex.com/signup
+    Nginx           -->> User           :   HTTP 200 OK signup.html

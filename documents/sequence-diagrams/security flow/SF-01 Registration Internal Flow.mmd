@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ServiceAuth
+    participant AuthDB
+
+    User            ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/users/register \nCreateUserRequest
+    ServiceAuth     ->>  AuthDB         :   check email and username
+    alt email or username available in db
+        AuthDB      -->> ServiceAuth    :   AuthEntity
+        ServiceAuth -->> User           :   HTTP 409 Conflict
+    else Not Found
+        AuthDB          -->> ServiceAuth    :   not found
+        ServiceAuth     ->>  ServiceAuth    :   hash password (BCrypt)
+        ServiceAuth     ->>  AuthDB         :   save UserEntity
+        AuthDB          -->> ServiceAuth    :   saved UserEntity
+        ServiceAuth     ->>  ServiceAuth    :   generate Access Token (sign with private key )
+        ServiceAuth     ->>  ServiceAuth    :   generate Refresh Token (sign with private key)
+        ServiceAuth     ->>  AuthDB         :   save RefreshTokenEntity
+        AuthDB          -->> ServiceAuth    :   ok
+        ServiceAuth     -->> User           :   HTTP 200 OK CreateUserResponse
+    end

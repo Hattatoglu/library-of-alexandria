@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ServiceAuth
+    participant AuthDB
+
+    Note over User,AuthDB: User's Access Token expired, Refresh Token still valid
+
+    User             ->>  ServiceAuth   :   HTTP POST http://service-auth/api/v1/auth/refresh <br/>RefreshTokenRequest
+    ServiceAuth      ->>  AuthDB        :   find RefreshTokenEntity by token
+    AuthDB           -->> ServiceAuth   :   RefreshTokenEntity
+    alt Not Found
+        ServiceAuth  -->> User          :   HTTP 401 Unauthorized
+    else Found
+        ServiceAuth ->>  ServiceAuth    :   generate new Access Token (private key ile imzala)
+        ServiceAuth ->>  ServiceAuth    :   generate new Refresh Token (private key ile imzala)
+        ServiceAuth ->>  AuthDB         :   save new RefreshTokenEntity
+        ServiceAuth ->>  AuthDB         :   delete old RefreshTokenEntity
+        AuthDB      -->> ServiceAuth    :   ok
+        ServiceAuth -->> User           :   HTTP 200 OK RefreshTokenResponse
+    end

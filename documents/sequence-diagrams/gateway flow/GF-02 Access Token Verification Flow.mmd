@@ -1,0 +1,11 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Gateway
+    participant Redis
+
+    User            ->>  Gateway        :   HTTP GET http://server-gateway/api/v1/auth/verify <br/>(with Access Token)
+    Gateway         ->>  Gateway        :   verify signature with cached public key
+    Gateway         ->>  Redis          :   GET blacklist:{accessToken}
+    Redis           -->> Gateway        :   not found
+    Gateway         -->> User           :   HTTP 200 OK

@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Nginx
+    participant Gateway
+    participant ServiceLoan
+    participant CatalogDB
+
+    Note over User,CatalogDB : User has already logged in.<br/>REF: UC-05 Login user
+    Note over User: User has already been searchbook.html on page<br/>REF: UC-09 Loading searchbook page
+
+    User            ->>  Nginx          :   HTTP GET http://libofalex.com/search?name=<<bookname>>
+    Nginx           ->>  Gateway        :   HTTP GET http://server-gateway/search?name=<<bookname>>
+    Gateway         ->>  Gateway        :   verify signature with cached public key
+    alt Unsuccessfull
+        Gateway     -->> Nginx          :   HTTP 401 Unauthorized
+        Nginx       -->> User           :   HTTP 401 Unauthorized
+    else
+        Gateway     ->>  ServiceCatalog :   HTTP GET http://service-catalog/api/v1/books/search?name=<<bookname>>
+        ServiceCatalog ->> CatalogDB    :   findAllBooksByName
+        CatalogDB   -->> ServiceCatalog :   List<BookEntity>
+        ServiceCatalog -->> Gateway     :   HTTP 200 OK SearchBookResponse
+        Gateway     -->> Nginx          :   HTTP 200 OK SearchBookResponse
+        Nginx       -->> User           :   HTTP 200 OK SearchBookResponse
+    end

@@ -1,0 +1,19 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ServiceAuth
+    participant AuthDB    
+    
+    User            ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/auth/login <br/>LoginUserRequest
+    ServiceAuth     ->>  AuthDB         :   find user by username
+    AuthDB          -->> ServiceAuth    :   UserEntity
+    ServiceAuth     ->>  ServiceAuth    :   verify password (BCrypt)
+    alt Wrong Password
+        ServiceAuth -->> User           :   HTTP 401 Unauthorized
+    else Correct Password
+        ServiceAuth ->>  ServiceAuth    :   generate Access Token (sign with private key)
+        ServiceAuth ->>  ServiceAuth    :   generate Refresh Token (sign with private key)
+        ServiceAuth ->>  AuthDB         :   save RefreshTokenEntity
+        AuthDB      -->> ServiceAuth    :   ok
+        ServiceAuth -->> User        :   HTTP 200 OK LoginUserResponse
+    end

@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Nginx
+    participant Gateway
+    participant ServiceAuth
+
+    Note over User: User has already been on login page<br/>REF: UC-03 Loading login page
+
+    User            ->>  Nginx          :   HTTP POST http://libofalex.com/login <br/>LoginUserRequest
+    Nginx           ->>  Gateway        :   HTTP POST http://server-gateway/login <br/>LoginUserRequest
+    Gateway         ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/auth/login <br/>LoginUserRequest
+    Note over ServiceAuth: SF-02 Authentication internal flow
+    ServiceAuth -->> Gateway            :   HTTP 200 OK LoginUserResponse
+    Gateway     -->> Nginx              :   HTTP 200 OK LoginUserResponse
+    Nginx       -->> User               :   HTTP 200 OK library.html

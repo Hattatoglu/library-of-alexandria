@@ -1,0 +1,11 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Gateway
+    participant Redis
+    participant ServiceAuth
+
+    ServiceAuth -->> Gateway        :   HTTP 200 OK RefreshTokenResponse
+    Gateway     ->>  Redis          :   SET blacklist:{oldRefreshToken} (Token Rotation)
+    Redis       -->> Gateway        :   ok
+    Gateway     -->> User           :   HTTP 200 OK RefreshTokenResponse

@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Nginx
+    participant Gateway
+    participant ServiceAuth
+
+    Note over User,ServiceAuth: User has already navigate signup.html page<br/>REF : UC-02 Loading Signup Page
+
+    User            ->>  Nginx          :   HTTP POST http://libofalex.com/register <br/>CreateUserRequest
+    Nginx           ->>  Gateway        :   HTTP POST http://server-gateway/register <br/>CreateUserRequest
+    Gateway         ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/users/register <br/>CreateUserRequest
+    Note over ServiceAuth: REF: SF-01 Registration Internal Flow
+    ServiceAuth     -->> Gateway        :   HTTP 200 OK CreateUserResponse
+    Gateway         -->> Nginx          :   HTTP 200 OK CreateUserResponse
+    Nginx           -->> User           :   HTTP 200 OK CreateUserResponse
+    User            ->>  Nginx          :   HTTP GET http://libofalex.com/library <br/>(with Access Token)
+    Nginx           ->>  Gateway        :   HTTP GET http://server-gateway/api/v1/auth/verify <br/>(with Access Token)
+    Note over Gateway: REF: GF-02 Access Token Verification Flow
+    Gateway         -->> Nginx          :   HTTP 200 OK
+    Nginx           -->> User           :   HTTP 200 OK library.html

@@ -1,0 +1,8 @@
+sequenceDiagram
+    autonumber
+    participant Gateway
+    participant ServiceAuth
+
+    Gateway         ->>  ServiceAuth    :   HTTP GET http://service-auth/api/v1/auth/public-key
+    ServiceAuth     -->> Gateway        :   HTTP 200 OK PublicKeyResponse
+    Gateway         ->>  Gateway        :   put Public Key into cache
