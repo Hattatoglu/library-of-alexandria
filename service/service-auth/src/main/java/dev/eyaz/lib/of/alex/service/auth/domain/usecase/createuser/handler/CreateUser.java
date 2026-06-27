@@ -16,7 +16,7 @@ public class CreateUser implements UseCase {
     private String birthdate;
 
     private UUID userId;
-    private Set<Role> authorities;
+    private String role;
 
     private String accessToken;
     private String refreshToken;
@@ -72,44 +72,12 @@ public class CreateUser implements UseCase {
         this.userId = userId;
     }
 
-    public boolean isAccountNonExpired() {
-        return accountNonExpired;
+    public String getRole() {
+        return role;
     }
 
-    public void setAccountNonExpired(boolean accountNonExpired) {
-        this.accountNonExpired = accountNonExpired;
-    }
-
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
-    }
-
-    public void setAccountNonLocked(boolean accountNonLocked) {
-        this.accountNonLocked = accountNonLocked;
-    }
-
-    public boolean isCredentialsNonExpired() {
-        return credentialsNonExpired;
-    }
-
-    public void setCredentialsNonExpired(boolean credentialsNonExpired) {
-        this.credentialsNonExpired = credentialsNonExpired;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public Set<Role> getAuthorities() {
-        return authorities;
-    }
-
-    public void setAuthorities(Set<Role> authorities) {
-        this.authorities = authorities;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getAccessToken() {
