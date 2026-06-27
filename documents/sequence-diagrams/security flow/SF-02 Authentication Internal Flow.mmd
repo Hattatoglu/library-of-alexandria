@@ -6,7 +6,7 @@ sequenceDiagram
     
     User            ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/auth/login <br/>LoginUserRequest
     ServiceAuth     ->>  AuthDB         :   find user by username
-    AuthDB          -->> ServiceAuth    :   UserEntity
+    AuthDB          -->> ServiceAuth    :   AuthEntity
     ServiceAuth     ->>  ServiceAuth    :   verify password (BCrypt)
     alt Wrong Password
         ServiceAuth -->> User           :   HTTP 401 Unauthorized

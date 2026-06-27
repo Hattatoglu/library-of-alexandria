@@ -1,0 +1,57 @@
+classDiagram
+
+    class PublicKeyResponse {
+        -String publicKey
+        -String algorithm
+        -String expiresAt
+    }
+
+    class AuthEntity {
+        -Long id
+        -UUID userId
+        -String name
+        -String username
+        -String password
+        -String email
+        -String birthdate
+        -boolean accountNonExpired
+        -boolean accountNonLocked
+        -boolean credentialsNonExpired
+        -boolean isEnabled
+        -Set~Role~ authorities
+    }
+
+    class Role {
+        <<Enumeration>>
+        +SUPER_USER
+        +ADMIN_USER
+        +CUSTOM_USER
+        -String value
+    }
+
+    class CreateUserRequest {
+        -String name
+        -String username
+        -String password
+        -String email
+        -String birthdate
+    }
+
+    class LoginUserRequest {
+        -String username
+        -String password
+    }
+
+    class RefreshTokenRequest{
+    }
+
+    class RefreshTokenEntity {
+        -Long id
+        -UUID userId
+        -String token
+        -String createdAt
+        -String expiresAt
+    }
+
+    class LogoutRequest{
+    }

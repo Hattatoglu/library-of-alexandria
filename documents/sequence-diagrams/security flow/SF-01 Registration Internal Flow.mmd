@@ -12,8 +12,8 @@ sequenceDiagram
     else Not Found
         AuthDB          -->> ServiceAuth    :   not found
         ServiceAuth     ->>  ServiceAuth    :   hash password (BCrypt)
-        ServiceAuth     ->>  AuthDB         :   save UserEntity
-        AuthDB          -->> ServiceAuth    :   saved UserEntity
+        ServiceAuth     ->>  AuthDB         :   save AuthEntity
+        AuthDB          -->> ServiceAuth    :   saved AuthEntity
         ServiceAuth     ->>  ServiceAuth    :   generate Access Token (sign with private key )
         ServiceAuth     ->>  ServiceAuth    :   generate Refresh Token (sign with private key)
         ServiceAuth     ->>  AuthDB         :   save RefreshTokenEntity
