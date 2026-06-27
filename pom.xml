@@ -15,6 +15,9 @@
     <packaging>pom</packaging>
     <name>library-of-alexandria</name>
     <description>library of alexandria book reservation application</description>
+    <modules>
+        <module>artifactory</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
