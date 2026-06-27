@@ -17,6 +17,7 @@
     <description>library of alexandria book reservation application</description>
     <modules>
         <module>artifactory</module>
+        <module>service</module>
     </modules>
 
     <properties>
