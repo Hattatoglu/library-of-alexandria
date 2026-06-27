@@ -1,6 +1,11 @@
 package dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCase;
+import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.Role;
+import jakarta.persistence.*;
+
+import java.util.Set;
+import java.util.UUID;
 
 public class CreateUser implements UseCase {
 
@@ -9,6 +14,9 @@ public class CreateUser implements UseCase {
     private String password;
     private String email;
     private String birthdate;
+
+    private UUID userId;
+    private Set<Role> authorities;
 
     private String accessToken;
     private String refreshToken;
@@ -54,6 +62,54 @@ public class CreateUser implements UseCase {
 
     public void setBirthdate(String birthdate) {
         this.birthdate = birthdate;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public boolean isAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    public void setAccountNonExpired(boolean accountNonExpired) {
+        this.accountNonExpired = accountNonExpired;
+    }
+
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
+    public boolean isCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    public void setCredentialsNonExpired(boolean credentialsNonExpired) {
+        this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    public Set<Role> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Role> authorities) {
+        this.authorities = authorities;
     }
 
     public String getAccessToken() {
