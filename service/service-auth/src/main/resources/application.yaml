@@ -25,6 +25,6 @@ jwt:
   refresh-token-expiration-ms: ${JWT_REFRESH_TOKEN_EXP:604800000}  # 7 Days
 
 cookie:
-  domain: ${COOKIE_DOMAIN:localhost}
+  domain: ${COOKIE_DOMAIN:libofalex.com}
   secure: ${COOKIE_SECURE:false}
   same-site: ${COOKIE_SAME_SITE:Strict}

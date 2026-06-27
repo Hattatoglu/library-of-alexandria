@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.service.auth.infra.rest.dto;
+package dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.request;
 
 public class CreateUserRequest {
 

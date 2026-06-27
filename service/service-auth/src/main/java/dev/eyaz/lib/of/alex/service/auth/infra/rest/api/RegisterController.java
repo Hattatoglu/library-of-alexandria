@@ -3,21 +3,16 @@ package dev.eyaz.lib.of.alex.service.auth.infra.rest.api;
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler.CreateUser;
 import dev.eyaz.lib.of.alex.service.auth.infra.rest.cookie.CookieProvider;
-import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.CreateUserRequest;
-import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.CreateUserResponse;
-import dev.eyaz.lib.of.alex.service.auth.infra.security.config.CookieProperties;
-import dev.eyaz.lib.of.alex.service.auth.infra.security.config.JwtProperties;
+import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.request.CreateUserRequest;
+import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.response.CreateUserResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/v1/auth")
