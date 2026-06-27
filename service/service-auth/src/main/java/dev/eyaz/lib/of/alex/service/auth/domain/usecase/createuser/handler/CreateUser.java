@@ -1,9 +1,11 @@
 package dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCase;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.Role;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,10 +18,12 @@ public class CreateUser implements UseCase {
     private String birthdate;
 
     private UUID userId;
-    private String role;
+    private UserRole role;
 
     private String accessToken;
+    private LocalDateTime accessTokenExpiresAt;
     private String refreshToken;
+    private LocalDateTime refreshTokenExpiresAt;
 
     public CreateUser() {
     }
@@ -72,11 +76,11 @@ public class CreateUser implements UseCase {
         this.userId = userId;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
@@ -94,5 +98,21 @@ public class CreateUser implements UseCase {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public LocalDateTime getAccessTokenExpiresAt() {
+        return accessTokenExpiresAt;
+    }
+
+    public void setAccessTokenExpiresAt(LocalDateTime accessTokenExpiresAt) {
+        this.accessTokenExpiresAt = accessTokenExpiresAt;
+    }
+
+    public LocalDateTime getRefreshTokenExpiresAt() {
+        return refreshTokenExpiresAt;
+    }
+
+    public void setRefreshTokenExpiresAt(LocalDateTime refreshTokenExpiresAt) {
+        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
     }
 }

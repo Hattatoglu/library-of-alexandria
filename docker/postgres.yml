@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17.5
+    shm_size: 128mb
+    container_name: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpass123
+
+  adminer:
+    image: adminer
+    ports:
+      - '8081:8080'

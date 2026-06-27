@@ -3,71 +3,34 @@ package dev.eyaz.lib.of.alex.service.auth.infra.postgres.model;
 import jakarta.persistence.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-public class AuthEntity implements UserDetails {
+@Entity
+@Table(name = "authentication")
+public class UserAuthEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false, unique = true, updatable = false)
     private UUID userId;
-
-    @Column(nullable = false, length = 100)
     private String name;
-
-    @Column(nullable = false, unique = true, length = 50)
     private String username;
-
-    @Column(nullable = false, length = 255)
     private String password;
-
-    @Column(nullable = false, unique = true, length = 150)
     private String email;
+    private String birthdate;
 
-    @Column(name = "birthdate")
-    private LocalDateTime birthdate;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean isEnabled;
 
-    @Column(name = "account_non_expired", nullable = false)
-    private boolean accountNonExpired = true;
-
-    @Column(name = "account_non_locked", nullable = false)
-    private boolean accountNonLocked = true;
-
-    @Column(name = "credentials_non_expired", nullable = false)
-    private boolean credentialsNonExpired = true;
-
-    @Column(name = "is_enabled", nullable = false)
-    private boolean isEnabled = true;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @JoinTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role", nullable = false)
     private Set<Role> authorities;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    void prePersist() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    void preUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    public AuthEntity() {
-    }
 
     public Long getId() {
         return id;
@@ -115,11 +78,11 @@ public class AuthEntity implements UserDetails {
         this.email = email;
     }
 
-    public LocalDateTime getBirthdate() {
+    public String getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(LocalDateTime birthdate) {
+    public void setBirthdate(String birthdate) {
         this.birthdate = birthdate;
     }
 
@@ -166,21 +129,5 @@ public class AuthEntity implements UserDetails {
 
     public void setAuthorities(Set<Role> authorities) {
         this.authorities = authorities;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

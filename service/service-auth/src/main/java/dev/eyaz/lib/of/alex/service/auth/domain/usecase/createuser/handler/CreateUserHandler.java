@@ -1,21 +1,23 @@
 package dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.port.CreateUserPersistencePort;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.port.CreateUserSecurityPort;
-import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.Role;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class CreateUserHandler implements UseCaseHandler<CreateUser> {
 
     private final CreateUserPersistencePort createUserPersistencePort;
     private final CreateUserSecurityPort createUserSecurityPort;
 
-    public CreateUserHandler(CreateUserPersistencePort createUserPersistencePort, CreateUserSecurityPort createUserSecurityPort) {
+    public CreateUserHandler(CreateUserPersistencePort createUserPersistencePort,
+                             CreateUserSecurityPort createUserSecurityPort) {
         this.createUserPersistencePort = createUserPersistencePort;
         this.createUserSecurityPort = createUserSecurityPort;
     }
@@ -34,8 +36,7 @@ public class CreateUserHandler implements UseCaseHandler<CreateUser> {
 
     private CreateUser initiateUser(CreateUser usecase) {
         usecase.setUserId(UUID.randomUUID());
-        usecase.setAuthorities(Set.of(Role.ROLE_CUSTOM_USER));
-
+        usecase.setRole(UserRole.ROLE_CUSTOM_USER);
         return usecase;
     }
 
