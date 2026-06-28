@@ -1,0 +1,73 @@
+package dev.eyaz.lib.of.alex.service.auth.infra.rest.api;
+
+import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
+import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginUser;
+import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.UserAuthEntity;
+import dev.eyaz.lib.of.alex.service.auth.infra.rest.cookie.CookieProvider;
+import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.request.LoginUserRequest;
+import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.response.LoginUserResponse;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+public class LoginController {
+
+    private final AuthenticationManager authenticationManager;
+    private final CookieProvider cookieProvider;
+
+    private final UseCaseHandler<LoginUser> useCaseHandler;
+
+    public LoginController(AuthenticationManager authenticationManager,
+                           CookieProvider cookieProvider,
+                           UseCaseHandler<LoginUser> useCaseHandler) {
+        this.authenticationManager = authenticationManager;
+        this.cookieProvider = cookieProvider;
+        this.useCaseHandler = useCaseHandler;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginUserResponse> loginUser(@Valid @RequestBody LoginUserRequest request,
+                                                       HttpServletResponse response) {
+
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()));
+
+        LoginUser usecase = new LoginUser();
+        usecase.setUsername(request.getUsername());
+        usecase.setUserId(((UserAuthEntity) authentication.getPrincipal()).getUserId());
+        usecase.setRole(((UserAuthEntity) authentication.getPrincipal())
+                .getAuthorities()
+                .stream()
+                .map(role -> UserRole.valueOf(role.name()))
+                .collect(Collectors.toSet()));
+
+        LoginUser answer = useCaseHandler.handle(usecase);
+
+        cookieProvider.httpOnlyRefreshAndAccessTokenProvider(
+                response,
+                answer.getAccessToken(),
+                answer.getRefreshToken());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new LoginUserResponse(
+                        answer.getAccessTokenExpiresAt().toString(),
+                        answer.getRefreshTokenExpiresAt().toString()
+                ));
+    }
+}

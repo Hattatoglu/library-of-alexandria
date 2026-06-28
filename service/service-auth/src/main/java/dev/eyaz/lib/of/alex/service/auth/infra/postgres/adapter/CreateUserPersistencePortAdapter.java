@@ -9,7 +9,7 @@ import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.UserAuthRepos
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -42,8 +42,15 @@ public class CreateUserPersistencePortAdapter implements CreateUserPersistencePo
         entity.setUsername(usecase.getUsername());
         entity.setPassword(passwordEncoder.encode(usecase.getPassword()));
         entity.setEmail(usecase.getEmail());
-        entity.setBirthdate(usecase.getBirthdate());
-        entity.setAuthorities(Set.of(Role.valueOf(usecase.getRole().name())));
+        entity.setBirthdate(usecase.getBirthday());
+        entity.setAuthorities(usecase.getRole()
+                .stream()
+                .map(role -> Role.valueOf(role.name()))
+                .collect(Collectors.toSet()));
+        entity.setAccountNonExpired(usecase.isAccountNonExpired());
+        entity.setAccountNonLocked(usecase.isAccountNonLocked());
+        entity.setCredentialsNonExpired(usecase.isCredentialsNonExpired());
+        entity.setEnabled(usecase.isEnabled());
 
         try {
             userAuthRepository.save(entity);

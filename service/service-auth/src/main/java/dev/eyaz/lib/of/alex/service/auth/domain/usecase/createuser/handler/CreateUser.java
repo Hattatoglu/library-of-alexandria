@@ -2,8 +2,6 @@ package dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCase;
 import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
-import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.Role;
-import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,10 +13,15 @@ public class CreateUser implements UseCase {
     private String username;
     private String password;
     private String email;
-    private String birthdate;
+    private String birthday;
 
     private UUID userId;
-    private UserRole role;
+    private Set<UserRole> role;
+
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean isEnabled;
 
     private String accessToken;
     private LocalDateTime accessTokenExpiresAt;
@@ -60,12 +63,12 @@ public class CreateUser implements UseCase {
         this.email = email;
     }
 
-    public String getBirthdate() {
-        return birthdate;
+    public String getBirthday() {
+        return birthday;
     }
 
-    public void setBirthdate(String birthdate) {
-        this.birthdate = birthdate;
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
     }
 
     public UUID getUserId() {
@@ -76,12 +79,44 @@ public class CreateUser implements UseCase {
         this.userId = userId;
     }
 
-    public UserRole getRole() {
+    public Set<UserRole> getRole() {
         return role;
     }
 
-    public void setRole(UserRole role) {
+    public void setRole(Set<UserRole> role) {
         this.role = role;
+    }
+
+    public boolean isAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    public void setAccountNonExpired(boolean accountNonExpired) {
+        this.accountNonExpired = accountNonExpired;
+    }
+
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
+    public boolean isCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    public void setCredentialsNonExpired(boolean credentialsNonExpired) {
+        this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 
     public String getAccessToken() {

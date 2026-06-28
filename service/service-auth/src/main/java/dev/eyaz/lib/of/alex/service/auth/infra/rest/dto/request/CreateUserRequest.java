@@ -6,7 +6,7 @@ public class CreateUserRequest {
     private String username;
     private String password;
     private String email;
-    private String birthdate;
+    private String birthday;
 
     public CreateUserRequest() {
     }
@@ -43,11 +43,11 @@ public class CreateUserRequest {
         this.email = email;
     }
 
-    public String getBirthdate() {
-        return birthdate;
+    public String getBirthday() {
+        return birthday;
     }
 
-    public void setBirthdate(String birthdate) {
-        this.birthdate = birthdate;
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
     }
 }

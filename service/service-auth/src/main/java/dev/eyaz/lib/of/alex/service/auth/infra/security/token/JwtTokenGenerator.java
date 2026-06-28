@@ -11,6 +11,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -31,11 +32,11 @@ public class JwtTokenGenerator implements JwtTokenService{
 
 
     @Override
-    public String generateAccessToken(UUID userId, String username, String role, Date now, Date expiry) {
+    public String generateAccessToken(UUID userId, String username, List<String> roles, Date now, Date expiry) {
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim("username", username)
-                .claim("roles", role)
+                .claim("roles", roles)
                 .claim("type", "access")
                 .issuedAt(now)
                 .expiration(expiry)
@@ -44,9 +45,7 @@ public class JwtTokenGenerator implements JwtTokenService{
     }
 
     @Override
-    public String generateRefreshToken(UUID userId) {
-        Date now    = new Date();
-        Date expiry = new Date(now.getTime() + jwtProperties.refreshTokenExpirationMs());
+    public String generateRefreshToken(UUID userId, Date now, Date expiry) {
 
         return Jwts.builder()
                 .subject(userId.toString())
