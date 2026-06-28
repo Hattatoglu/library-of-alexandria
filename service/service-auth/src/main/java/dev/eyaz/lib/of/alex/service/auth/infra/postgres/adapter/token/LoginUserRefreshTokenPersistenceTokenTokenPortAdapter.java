@@ -1,17 +1,17 @@
-package dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter;
+package dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.token;
 
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginUser;
-import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserRefreshTokenPersistencePort;
+import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserRefreshTokenPersistenceTokenPort;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.RefreshTokenEntity;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.RefreshTokenRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoginUserRefreshTokenPersistencePortAdapter implements LoginUserRefreshTokenPersistencePort {
+public class LoginUserRefreshTokenPersistenceTokenTokenPortAdapter implements LoginUserRefreshTokenPersistenceTokenPort {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public LoginUserRefreshTokenPersistencePortAdapter(RefreshTokenRepository refreshTokenRepository) {
+    public LoginUserRefreshTokenPersistenceTokenTokenPortAdapter(RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 

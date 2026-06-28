@@ -1,7 +1,7 @@
 package dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
-import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserRefreshTokenPersistencePort;
+import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserRefreshTokenPersistenceTokenPort;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserSecurityPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class LoginUserHandler implements UseCaseHandler<LoginUser> {
 
     private final LoginUserSecurityPort loginUserSecurityPort;
-    private final LoginUserRefreshTokenPersistencePort loginUserRefreshTokenPersistencePort;
+    private final LoginUserRefreshTokenPersistenceTokenPort loginUserRefreshTokenPersistenceTokenPort;
 
-    public LoginUserHandler(LoginUserSecurityPort loginUserSecurityPort, LoginUserRefreshTokenPersistencePort loginUserRefreshTokenPersistencePort) {
+    public LoginUserHandler(LoginUserSecurityPort loginUserSecurityPort, LoginUserRefreshTokenPersistenceTokenPort loginUserRefreshTokenPersistenceTokenPort) {
         this.loginUserSecurityPort = loginUserSecurityPort;
-        this.loginUserRefreshTokenPersistencePort = loginUserRefreshTokenPersistencePort;
+        this.loginUserRefreshTokenPersistenceTokenPort = loginUserRefreshTokenPersistenceTokenPort;
     }
 
     @Override
@@ -29,6 +29,6 @@ public class LoginUserHandler implements UseCaseHandler<LoginUser> {
     }
 
     private LoginUser persistRefreshToken(LoginUser usecase) {
-        return loginUserRefreshTokenPersistencePort.persistRefreshToken(usecase);
+        return loginUserRefreshTokenPersistenceTokenPort.persistRefreshToken(usecase);
     }
 }

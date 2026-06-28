@@ -1,8 +1,8 @@
-package dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter;
+package dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.auth;
 
 import dev.eyaz.lib.of.alex.service.auth.core.exception.UserAlreadyExistsException;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler.CreateUser;
-import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.port.CreateUserPersistencePort;
+import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.port.CreateUserPersistenceAuthPort;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.Role;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.UserAuthEntity;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.UserAuthRepository;
@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 
 @Component
-public class CreateUserPersistencePortAdapter implements CreateUserPersistencePort {
+public class CreateUserPersistenceAuthAuthPortAdapter implements CreateUserPersistenceAuthPort {
 
     private final UserAuthRepository userAuthRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public CreateUserPersistencePortAdapter(UserAuthRepository userAuthRepository, PasswordEncoder passwordEncoder) {
+    public CreateUserPersistenceAuthAuthPortAdapter(UserAuthRepository userAuthRepository, PasswordEncoder passwordEncoder) {
         this.userAuthRepository = userAuthRepository;
         this.passwordEncoder = passwordEncoder;
     }

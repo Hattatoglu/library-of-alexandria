@@ -14,9 +14,5 @@ sequenceDiagram
         ServiceAuth     ->>  ServiceAuth    :   hash password (BCrypt)
         ServiceAuth     ->>  AuthDB         :   save AuthEntity
         AuthDB          -->> ServiceAuth    :   saved AuthEntity
-        ServiceAuth     ->>  ServiceAuth    :   generate Access Token (sign with private key )
-        ServiceAuth     ->>  ServiceAuth    :   generate Refresh Token (sign with private key)
-        ServiceAuth     ->>  AuthDB         :   save RefreshTokenEntity
-        AuthDB          -->> ServiceAuth    :   ok
         ServiceAuth     -->> User           :   HTTP 200 OK CreateUserResponse
     end

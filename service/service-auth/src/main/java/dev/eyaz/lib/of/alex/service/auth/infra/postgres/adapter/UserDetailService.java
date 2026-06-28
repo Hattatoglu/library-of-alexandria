@@ -24,6 +24,6 @@ public class UserDetailService implements UserDetailsService {
         if (option.isPresent()) {
             return option.get();
         }
-        throw new UsernameNotFoundException("user with "+ username + "not found!");
+        throw new UsernameNotFoundException("user with "+ username + " not found!");
     }
 }
