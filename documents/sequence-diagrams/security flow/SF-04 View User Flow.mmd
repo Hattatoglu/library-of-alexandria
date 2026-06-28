@@ -4,12 +4,12 @@ sequenceDiagram
     participant ServiceAuth
     participant AuthDB
 
-    User             ->>  ServiceAuth   :   HTTP GET http://service-auth/api/v1/users/searchuser?username=<<username>>
+    User             ->>  ServiceAuth   :   HTTP GET http://service-auth/api/v1/auth/searchuser?username=<<username>>
     ServiceAuth      ->>  AuthDB        :   find AuthEntity by username
     alt Not Found
         AuthDB       -->> ServiceAuth   :   Null
         ServiceAuth  -->> User          :   HTTP 404 Not Found
     else Found
         AuthDB       -->> ServiceAuth   :   AuthEntity
-        ServiceAuth  -->> User          :   HTTP 200 OK ViewUserResponse
+        ServiceAuth  -->> User          :   HTTP 200 OK UserDataResponse
     end
