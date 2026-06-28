@@ -1,5 +1,7 @@
 package dev.eyaz.lib.of.alex.service.auth.core.enums;
 
+import java.util.Arrays;
+
 public enum UserRole {
     ROLE_SUPER_USER("SUPER"),
     ROLE_ADMIN_USER("ADMIN"),
@@ -15,4 +17,11 @@ public enum UserRole {
         return this.value;
     }
 
+    public static UserRole fromValue(String value) {
+        return Arrays.stream(values())
+                .filter(role -> role.value.equals(value))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Unknown role: " + value));
+    }
 }
