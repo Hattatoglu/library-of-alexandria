@@ -15,4 +15,8 @@ public class UserRoleGrantedAuthority implements GrantedAuthority {
     public String getAuthority() {
         return "ROLE_" + role.name();
     }
+
+    public Role getRole() {
+        return role;
+    }
 }

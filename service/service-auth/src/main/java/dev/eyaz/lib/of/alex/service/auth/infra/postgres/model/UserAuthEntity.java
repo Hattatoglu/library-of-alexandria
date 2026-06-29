@@ -8,19 +8,20 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "authentication")
+@Table(name = "users")
 public class UserAuthEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id")
     private UUID userId;
     private String name;
     private String username;
     private String password;
     private String email;
-    private String birthdate;
+    private LocalDateTime birthday;
 
     private boolean accountNonExpired;
     private boolean accountNonLocked;
@@ -28,9 +29,12 @@ public class UserAuthEntity {
     private boolean isEnabled;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    @JoinTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    )
     @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -97,12 +101,12 @@ public class UserAuthEntity {
         this.email = email;
     }
 
-    public String getBirthdate() {
-        return birthdate;
+    public LocalDateTime getBirthday() {
+        return birthday;
     }
 
-    public void setBirthdate(String birthdate) {
-        this.birthdate = birthdate;
+    public void setBirthday(LocalDateTime birthday) {
+        this.birthday = birthday;
     }
 
     public boolean isAccountNonExpired() {

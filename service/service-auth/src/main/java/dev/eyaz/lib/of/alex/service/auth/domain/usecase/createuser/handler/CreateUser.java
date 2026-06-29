@@ -13,7 +13,7 @@ public class CreateUser implements UseCase {
     private String username;
     private String password;
     private String email;
-    private String birthday;
+    private LocalDateTime birthday;
 
     private UUID userId;
     private Set<Role> role;
@@ -63,11 +63,11 @@ public class CreateUser implements UseCase {
         this.email = email;
     }
 
-    public String getBirthday() {
+    public LocalDateTime getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(LocalDateTime birthday) {
         this.birthday = birthday;
     }
 

@@ -1,7 +1,10 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.rest.api;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginUser;
+import dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.details.SecurityUserAdapter;
+import dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.details.UserRoleGrantedAuthority;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.UserAuthEntity;
 import dev.eyaz.lib.of.alex.service.auth.infra.rest.cookie.CookieProvider;
 import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.request.LoginUserRequest;
@@ -17,6 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -47,8 +53,17 @@ public class LoginController {
 
         LoginUser usecase = new LoginUser();
         usecase.setUsername(request.getUsername());
-        usecase.setUserId(((UserAuthEntity) authentication.getPrincipal()).getUserId());
-        usecase.setRole(((UserAuthEntity) authentication.getPrincipal()).getRoles());
+        usecase.setUserId(((SecurityUserAdapter) authentication.getPrincipal()).getUserId());
+        //usecase.setRole(((SecurityUserAdapter) authentication.getPrincipal()).getAuthorities());
+
+        Set<Role> roles = ((SecurityUserAdapter) authentication.getPrincipal())
+                .getAuthorities()
+                .stream()
+                .map(authority -> (UserRoleGrantedAuthority) authority)
+                .map(UserRoleGrantedAuthority::getRole)
+                .collect(Collectors.toSet());
+
+        usecase.setRole(roles);
 
         LoginUser answer = useCaseHandler.handle(usecase);
 

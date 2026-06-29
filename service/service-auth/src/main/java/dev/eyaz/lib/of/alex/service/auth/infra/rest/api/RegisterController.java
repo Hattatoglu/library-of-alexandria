@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 public class RegisterController {
@@ -29,7 +33,12 @@ public class RegisterController {
         usecase.setUsername(request.getUsername());
         usecase.setPassword(request.getPassword());
         usecase.setEmail(request.getEmail());
-        usecase.setBirthday(request.getBirthday());
+        usecase.setBirthday(
+                LocalDate.parse(
+                        request.getBirthday(),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                ).atStartOfDay()
+        );
 
         CreateUser answer = useCaseHandler.handle(usecase);
 

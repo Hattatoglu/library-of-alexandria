@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class CreateUserPersistenceAuthAuthPortAdapter implements CreateUserPersistenceAuthPort {
+public class CreateUserPersistenceAuthPortAdapter implements CreateUserPersistenceAuthPort {
 
     private final UserAuthRepository userAuthRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public CreateUserPersistenceAuthAuthPortAdapter(UserAuthRepository userAuthRepository, PasswordEncoder passwordEncoder) {
+    public CreateUserPersistenceAuthPortAdapter(UserAuthRepository userAuthRepository, PasswordEncoder passwordEncoder) {
         this.userAuthRepository = userAuthRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -39,7 +39,7 @@ public class CreateUserPersistenceAuthAuthPortAdapter implements CreateUserPersi
         entity.setUsername(usecase.getUsername());
         entity.setPassword(passwordEncoder.encode(usecase.getPassword()));
         entity.setEmail(usecase.getEmail());
-        entity.setBirthdate(usecase.getBirthday());
+        entity.setBirthday(usecase.getBirthday());
         entity.setRoles(usecase.getRole());
         entity.setAccountNonExpired(usecase.isAccountNonExpired());
         entity.setAccountNonLocked(usecase.isAccountNonLocked());
