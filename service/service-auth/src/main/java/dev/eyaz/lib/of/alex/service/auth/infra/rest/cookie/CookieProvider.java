@@ -34,6 +34,11 @@ public class CookieProvider {
 
     }
 
+    public void clearAuthCookies(HttpServletResponse response) {
+        response.addHeader("Set-Cookie", buildCookie(CookieProperties.ACCESS_TOKEN_NAME, "", 0).toString());
+        response.addHeader("Set-Cookie", buildCookie(CookieProperties.REFRESH_TOKEN_NAME, "", 0).toString());
+    }
+
     private ResponseCookie buildCookie(String name, String value, long maxAgeSeconds) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
