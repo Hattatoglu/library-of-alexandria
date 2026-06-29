@@ -8,8 +8,9 @@ services:
     environment:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass123
+    networks:
+      - libofalex
 
-  adminer:
-    image: adminer
-    ports:
-      - '8081:8080'
+networks:
+  libofalex:
+    driver: bridge

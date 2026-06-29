@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.service.annotation.HttpExchange;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,8 +43,7 @@ public class RegisterController {
 
         CreateUser answer = useCaseHandler.handle(usecase);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CreateUserResponse());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }

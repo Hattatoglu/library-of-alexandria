@@ -1,0 +1,12 @@
+services:
+  service-auth:
+    image: service-auth:latest
+    container_name: service-auth
+    ports:
+      - "8080:8080"
+    networks:
+      - libofalex
+
+networks:
+  libofalex:
+    driver: bridge

@@ -1,0 +1,11 @@
+services:
+  adminer:
+    image: adminer
+    ports:
+      - '8081:8080'
+    networks:
+      - libofalex
+
+networks:
+  libofalex:
+    driver: bridge
