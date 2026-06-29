@@ -1,6 +1,6 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.rest.api;
 
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.updateuser.handler.UpdateUser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.updateuser.handler.UpdateUserHandler;
 import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.request.UpdateRoleRequest;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,7 @@ public class UpdateRoleController {
         UpdateUser usecase = new UpdateUser();
         usecase.setUsername(request.username());
         usecase.setUserId(UUID.fromString(request.userId()));
-        usecase.setNewRole(UserRole.fromValue(request.role()));
+        usecase.setNewRole(Role.fromValue(request.role()));
 
         UpdateUser answer = updateUserHandler.handle(usecase);
 
@@ -39,7 +38,7 @@ public class UpdateRoleController {
                 .body(new UpdateRoleResponse(
                         answer.getUsername(),
                         answer.getRole().stream()
-                                .map(UserRole::getValue)
+                                .map(Role::getValue)
                                 .collect(Collectors.toSet())
                 ));
     }

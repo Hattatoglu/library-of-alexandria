@@ -1,6 +1,6 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.security.adapter;
 
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.handler.RefreshTokenUseCase;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.port.RefreshTokenUseCaseSecurityPort;
 import dev.eyaz.lib.of.alex.service.auth.infra.security.config.JwtProperties;
@@ -31,7 +31,7 @@ public class RefreshTokenUseCaseSecurityPortAdapter implements RefreshTokenUseCa
         String accessToken = jwtTokenService.generateAccessToken(
                 usecase.getUserId(),
                 usecase.getUsername(),
-                usecase.getRoles().stream().map(UserRole::name).toList(),
+                usecase.getRoles().stream().map(Role::name).toList(),
                 now,
                 accessExpiry);
         String refreshToken = jwtTokenService.generateRefreshToken(

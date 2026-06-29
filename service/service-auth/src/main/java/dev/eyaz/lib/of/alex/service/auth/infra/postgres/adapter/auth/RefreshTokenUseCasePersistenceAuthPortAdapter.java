@@ -1,6 +1,5 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.auth;
 
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
 import dev.eyaz.lib.of.alex.service.auth.core.exception.UserNotFoundException;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.handler.RefreshTokenUseCase;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.port.RefreshTokenUseCasePersistenceAuthPort;
@@ -9,7 +8,6 @@ import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.UserAuthRepos
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class RefreshTokenUseCasePersistenceAuthPortAdapter
@@ -27,10 +25,7 @@ public class RefreshTokenUseCasePersistenceAuthPortAdapter
         if(optional.isPresent()) {
             UserAuthEntity entity = optional.get();
             useCase.setUsername(entity.getUsername());
-            useCase.setRoles(entity.getAuthorities().stream().
-                    map(role -> UserRole.valueOf(role.name()))
-                    .collect(Collectors.toSet())
-            );
+            useCase.setRoles(entity.getRoles());
             return useCase;
         }
         throw new UserNotFoundException("User : " + useCase.getUserId() + " not found!");

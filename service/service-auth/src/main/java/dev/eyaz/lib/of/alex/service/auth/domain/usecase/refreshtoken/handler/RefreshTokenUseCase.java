@@ -1,7 +1,7 @@
 package dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCase;
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -11,7 +11,7 @@ public class RefreshTokenUseCase implements UseCase {
 
     private UUID userId;
     private String username;
-    private Set<UserRole> roles;
+    private Set<Role> roles;
     private String refreshToken;
     private String newAccessToken;
     private String newRefreshToken;
@@ -37,11 +37,11 @@ public class RefreshTokenUseCase implements UseCase {
         this.username = username;
     }
 
-    public Set<UserRole> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<UserRole> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 

@@ -1,7 +1,7 @@
 package dev.eyaz.lib.of.alex.service.auth.domain.usecase.updateuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCase;
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 
 import java.util.Set;
 import java.util.UUID;
@@ -10,8 +10,8 @@ public class UpdateUser implements UseCase {
 
     private UUID userId;
     private String username;
-    private Set<UserRole> role;
-    private UserRole newRole;
+    private Set<Role> role;
+    private Role newRole;
 
     public UpdateUser() {
     }
@@ -32,19 +32,19 @@ public class UpdateUser implements UseCase {
         this.username = username;
     }
 
-    public Set<UserRole> getRole() {
+    public Set<Role> getRole() {
         return role;
     }
 
-    public void setRole(Set<UserRole> role) {
+    public void setRole(Set<Role> role) {
         this.role = role;
     }
 
-    public UserRole getNewRole() {
+    public Role getNewRole() {
         return newRole;
     }
 
-    public void setNewRole(UserRole newRole) {
+    public void setNewRole(Role newRole) {
         this.newRole = newRole;
     }
 }

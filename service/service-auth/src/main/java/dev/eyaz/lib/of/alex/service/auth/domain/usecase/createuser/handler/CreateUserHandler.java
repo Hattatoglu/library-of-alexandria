@@ -1,7 +1,7 @@
 package dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.port.CreateUserPersistenceAuthPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +32,7 @@ public class CreateUserHandler implements UseCaseHandler<CreateUser> {
 
     private CreateUser initiateUser(CreateUser usecase) {
         usecase.setUserId(UUID.randomUUID());
-        usecase.setRole(Set.of(UserRole.ROLE_CUSTOM_USER));
+        usecase.setRole(Set.of(Role.ROLE_CUSTOM_USER));
         usecase.setAccountNonExpired(true);
         usecase.setAccountNonLocked(true);
         usecase.setCredentialsNonExpired(true);

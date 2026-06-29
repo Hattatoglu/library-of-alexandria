@@ -1,7 +1,6 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.rest.api;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginUser;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.UserAuthEntity;
 import dev.eyaz.lib.of.alex.service.auth.infra.rest.cookie.CookieProvider;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -51,11 +48,7 @@ public class LoginController {
         LoginUser usecase = new LoginUser();
         usecase.setUsername(request.getUsername());
         usecase.setUserId(((UserAuthEntity) authentication.getPrincipal()).getUserId());
-        usecase.setRole(((UserAuthEntity) authentication.getPrincipal())
-                .getAuthorities()
-                .stream()
-                .map(role -> UserRole.valueOf(role.name()))
-                .collect(Collectors.toSet()));
+        usecase.setRole(((UserAuthEntity) authentication.getPrincipal()).getRoles());
 
         LoginUser answer = useCaseHandler.handle(usecase);
 

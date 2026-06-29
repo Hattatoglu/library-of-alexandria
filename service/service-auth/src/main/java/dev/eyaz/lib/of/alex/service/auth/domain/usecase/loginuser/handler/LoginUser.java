@@ -1,7 +1,7 @@
 package dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCase;
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -11,7 +11,7 @@ public class LoginUser implements UseCase {
 
     private String username;
     private UUID userId;
-    private Set<UserRole> role;
+    private Set<Role> role;
 
     private String accessToken;
     private LocalDateTime accessTokenExpiresAt;
@@ -37,11 +37,11 @@ public class LoginUser implements UseCase {
         this.userId = userId;
     }
 
-    public Set<UserRole> getRole() {
+    public Set<Role> getRole() {
         return role;
     }
 
-    public void setRole(Set<UserRole> role) {
+    public void setRole(Set<Role> role) {
         this.role = role;
     }
 

@@ -1,6 +1,6 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.security.adapter;
 
-import dev.eyaz.lib.of.alex.service.auth.core.enums.UserRole;
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginUser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserSecurityPort;
 import dev.eyaz.lib.of.alex.service.auth.infra.security.config.JwtProperties;
@@ -31,7 +31,7 @@ public class LoginUserSecurityPortAdapter implements LoginUserSecurityPort {
         String accessToken = jwtTokenService.generateAccessToken(
                 usecase.getUserId(),
                 usecase.getUsername(),
-                usecase.getRole().stream().map(UserRole::name).toList(),
+                usecase.getRole().stream().map(Role::name).toList(),
                 now,
                 accessExpiry);
         String refreshToken = jwtTokenService.generateRefreshToken(

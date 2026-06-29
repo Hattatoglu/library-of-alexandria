@@ -2,14 +2,14 @@ package dev.eyaz.lib.of.alex.service.auth.core.enums;
 
 import java.util.Arrays;
 
-public enum UserRole {
+public enum Role {
     ROLE_SUPER_USER("SUPER"),
     ROLE_ADMIN_USER("ADMIN"),
     ROLE_CUSTOM_USER("USER");
 
     private final String value;
 
-    UserRole(String value) {
+    Role(String value) {
         this.value = value;
     }
 
@@ -17,7 +17,7 @@ public enum UserRole {
         return this.value;
     }
 
-    public static UserRole fromValue(String value) {
+    public static Role fromValue(String value) {
         return Arrays.stream(values())
                 .filter(role -> role.value.equals(value))
                 .findFirst()

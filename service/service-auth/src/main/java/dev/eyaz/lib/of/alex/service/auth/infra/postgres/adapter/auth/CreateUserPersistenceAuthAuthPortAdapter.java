@@ -3,13 +3,10 @@ package dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.auth;
 import dev.eyaz.lib.of.alex.service.auth.core.exception.UserAlreadyExistsException;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler.CreateUser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.port.CreateUserPersistenceAuthPort;
-import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.Role;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.UserAuthEntity;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.UserAuthRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 
 @Component
@@ -43,10 +40,7 @@ public class CreateUserPersistenceAuthAuthPortAdapter implements CreateUserPersi
         entity.setPassword(passwordEncoder.encode(usecase.getPassword()));
         entity.setEmail(usecase.getEmail());
         entity.setBirthdate(usecase.getBirthday());
-        entity.setAuthorities(usecase.getRole()
-                .stream()
-                .map(role -> Role.valueOf(role.name()))
-                .collect(Collectors.toSet()));
+        entity.setRoles(usecase.getRole());
         entity.setAccountNonExpired(usecase.isAccountNonExpired());
         entity.setAccountNonLocked(usecase.isAccountNonLocked());
         entity.setCredentialsNonExpired(usecase.isCredentialsNonExpired());

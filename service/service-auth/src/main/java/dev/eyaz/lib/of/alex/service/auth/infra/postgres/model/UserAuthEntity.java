@@ -1,7 +1,7 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.postgres.model;
 
+import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 import jakarta.persistence.*;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "authentication")
-public class UserAuthEntity implements UserDetails {
+public class UserAuthEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class UserAuthEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     @JoinTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role", nullable = false)
-    private Set<Role> authorities;
+    private Set<Role> roles;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -73,7 +73,6 @@ public class UserAuthEntity implements UserDetails {
         this.name = name;
     }
 
-    @Override
     public String getUsername() {
         return username;
     }
@@ -82,7 +81,6 @@ public class UserAuthEntity implements UserDetails {
         this.username = username;
     }
 
-    @Override
     public String getPassword() {
         return password;
     }
@@ -107,7 +105,6 @@ public class UserAuthEntity implements UserDetails {
         this.birthdate = birthdate;
     }
 
-    @Override
     public boolean isAccountNonExpired() {
         return accountNonExpired;
     }
@@ -116,7 +113,6 @@ public class UserAuthEntity implements UserDetails {
         this.accountNonExpired = accountNonExpired;
     }
 
-    @Override
     public boolean isAccountNonLocked() {
         return accountNonLocked;
     }
@@ -125,7 +121,6 @@ public class UserAuthEntity implements UserDetails {
         this.accountNonLocked = accountNonLocked;
     }
 
-    @Override
     public boolean isCredentialsNonExpired() {
         return credentialsNonExpired;
     }
@@ -134,7 +129,6 @@ public class UserAuthEntity implements UserDetails {
         this.credentialsNonExpired = credentialsNonExpired;
     }
 
-    @Override
     public boolean isEnabled() {
         return isEnabled;
     }
@@ -143,12 +137,20 @@ public class UserAuthEntity implements UserDetails {
         isEnabled = enabled;
     }
 
-    @Override
-    public Set<Role> getAuthorities() {
-        return authorities;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setAuthorities(Set<Role> authorities) {
-        this.authorities = authorities;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
 }

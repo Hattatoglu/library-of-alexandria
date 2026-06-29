@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter;
+package dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.details;
 
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.UserAuthEntity;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.UserAuthRepository;
@@ -22,7 +22,7 @@ public class UserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserAuthEntity> option = userAuthRepository.findByUsername(username);
         if (option.isPresent()) {
-            return option.get();
+            return new SecurityUserAdapter(option.get());
         }
         throw new UsernameNotFoundException("user with "+ username + " not found!");
     }
