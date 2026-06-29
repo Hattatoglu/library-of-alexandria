@@ -7,11 +7,11 @@ import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.RefreshTokenR
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoginUserRefreshTokenPersistenceTokenTokenPortAdapter implements LoginUserRefreshTokenPersistenceTokenPort {
+public class LoginUserRefreshTokenPersistenceTokenPortAdapter implements LoginUserRefreshTokenPersistenceTokenPort {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public LoginUserRefreshTokenPersistenceTokenTokenPortAdapter(RefreshTokenRepository refreshTokenRepository) {
+    public LoginUserRefreshTokenPersistenceTokenPortAdapter(RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 

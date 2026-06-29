@@ -18,6 +18,7 @@
     <modules>
         <module>artifactory</module>
         <module>service</module>
+        <module>server</module>
     </modules>
 
     <properties>

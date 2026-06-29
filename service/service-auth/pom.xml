@@ -58,9 +58,9 @@
 
         <!-- Postgres -->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
+            <groupId>dev.eyaz.lib.of.alex.server.postgres</groupId>
+            <artifactId>server-postgres</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Flyway -->
