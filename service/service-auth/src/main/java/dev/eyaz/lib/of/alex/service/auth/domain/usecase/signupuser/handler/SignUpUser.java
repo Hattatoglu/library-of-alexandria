@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.service.auth.domain.usecase.createuser.handler;
+package dev.eyaz.lib.of.alex.service.auth.domain.usecase.signupuser.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCase;
 import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-public class CreateUser implements UseCase {
+public class SignUpUser implements UseCase {
 
     private String name;
     private String username;
@@ -28,7 +28,7 @@ public class CreateUser implements UseCase {
     private String refreshToken;
     private LocalDateTime refreshTokenExpiresAt;
 
-    public CreateUser() {
+    public SignUpUser() {
     }
 
     public String getName() {
