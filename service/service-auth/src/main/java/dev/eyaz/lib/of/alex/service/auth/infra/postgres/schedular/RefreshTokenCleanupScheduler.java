@@ -20,7 +20,7 @@ public class RefreshTokenCleanupScheduler {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-    @Scheduled(cron = "${scheduler.refresh-token-cleanup.cron}")
+    @Scheduled(cron = "${scheduler.refresh-token-cleanup-cron}")
     @Transactional
     public void cleanupExpiredTokens() {
 

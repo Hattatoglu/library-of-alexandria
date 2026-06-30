@@ -16,7 +16,7 @@
     <description>this module contains libs that uses by server or services</description>
     <modules>
         <module>lib-domain</module>
-        <module>lib-infra</module>
+        <module>lib-infra-web</module>
     </modules>
 
 </project>

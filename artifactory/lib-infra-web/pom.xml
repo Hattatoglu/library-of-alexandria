@@ -10,8 +10,8 @@
     </parent>
 
     <groupId>dev.eyaz.lib.of.alex.artifactory.lib.infra</groupId>
-    <artifactId>lib-infra</artifactId>
-    <name>lib-infra</name>
+    <artifactId>lib-infra-web</artifactId>
+    <name>lib-infra-web</name>
     <description>infra library for library of alexandria application</description>
     <packaging>jar</packaging>
 

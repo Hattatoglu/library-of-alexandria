@@ -1,6 +1,6 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.rest.exception;
 
-import dev.eyaz.lib.of.alex.artifactory.lib.infra.exception.GlobalExceptionHandler;
+import dev.eyaz.lib.of.alex.artifactory.lib.infra.exception.WebExceptionHandlerSupport;
 import dev.eyaz.lib.of.alex.service.auth.core.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class ServiceAuthExceptionHandler extends GlobalExceptionHandler {
+public class ServiceAuthExceptionHandler extends WebExceptionHandlerSupport {
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ProblemDetail handleUserAlreadyExists(UserAlreadyExistsException ex) {
         return problem(HttpStatus.CONFLICT, "user-already-exists", ex.getMessage());

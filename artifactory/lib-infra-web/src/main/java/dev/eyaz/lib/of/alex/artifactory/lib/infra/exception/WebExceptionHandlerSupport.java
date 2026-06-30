@@ -9,7 +9,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
-public class GlobalExceptionHandler {
+public class WebExceptionHandlerSupport {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
