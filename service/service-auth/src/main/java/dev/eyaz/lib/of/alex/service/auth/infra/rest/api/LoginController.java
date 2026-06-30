@@ -2,6 +2,7 @@ package dev.eyaz.lib.of.alex.service.auth.infra.rest.api;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
 import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
+import dev.eyaz.lib.of.alex.service.auth.core.exception.InvalidCredentialsException;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginUser;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.details.SecurityUserAdapter;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.adapter.details.UserRoleGrantedAuthority;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,15 +48,19 @@ public class LoginController {
                                                        HttpServletResponse response) {
 
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()));
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()));
+        } catch (AuthenticationException ex) {
+            throw new InvalidCredentialsException("Invalid username or password");
+        }
 
         LoginUser usecase = new LoginUser();
         usecase.setUsername(request.getUsername());
         usecase.setUserId(((SecurityUserAdapter) authentication.getPrincipal()).getUserId());
-        //usecase.setRole(((SecurityUserAdapter) authentication.getPrincipal()).getAuthorities());
 
         Set<Role> roles = ((SecurityUserAdapter) authentication.getPrincipal())
                 .getAuthorities()

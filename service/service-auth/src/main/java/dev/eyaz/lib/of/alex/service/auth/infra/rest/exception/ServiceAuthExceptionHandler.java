@@ -4,6 +4,7 @@ import dev.eyaz.lib.of.alex.artifactory.lib.infra.exception.GlobalExceptionHandl
 import dev.eyaz.lib.of.alex.service.auth.core.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -32,5 +33,10 @@ public class ServiceAuthExceptionHandler extends GlobalExceptionHandler {
     @ExceptionHandler(InsufficientRoleException.class)
     public ProblemDetail handleInsufficientRole(InsufficientRoleException ex) {
         return problem(HttpStatus.FORBIDDEN, "insufficient-role", ex.getMessage());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
+        return problem(HttpStatus.UNAUTHORIZED, "unauthorized", ex.getMessage());
     }
 }

@@ -23,11 +23,6 @@ public class SignUpUser implements UseCase {
     private boolean credentialsNonExpired;
     private boolean isEnabled;
 
-    private String accessToken;
-    private LocalDateTime accessTokenExpiresAt;
-    private String refreshToken;
-    private LocalDateTime refreshTokenExpiresAt;
-
     public SignUpUser() {
     }
 
@@ -117,37 +112,5 @@ public class SignUpUser implements UseCase {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public LocalDateTime getAccessTokenExpiresAt() {
-        return accessTokenExpiresAt;
-    }
-
-    public void setAccessTokenExpiresAt(LocalDateTime accessTokenExpiresAt) {
-        this.accessTokenExpiresAt = accessTokenExpiresAt;
-    }
-
-    public LocalDateTime getRefreshTokenExpiresAt() {
-        return refreshTokenExpiresAt;
-    }
-
-    public void setRefreshTokenExpiresAt(LocalDateTime refreshTokenExpiresAt) {
-        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
     }
 }

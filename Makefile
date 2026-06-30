@@ -1,5 +1,5 @@
 maven:
-	mvn clean install
+	mvn clean install -DSkipTests
 
 server-postgres:
 	docker compose -f docker/server/postgres/server-postgres-docker-compose.yaml -p libofalex up -d
