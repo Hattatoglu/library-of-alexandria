@@ -1,0 +1,34 @@
+classDiagram
+    class AddBookRequest {
+        -String isbn
+        -String bookName
+        -String author
+        -String publisher
+        -String type
+        -String edition
+    }
+
+    class BookType {
+        <<ENUMERATION>>
+        +NOVEL
+        +HISTORY
+        +LITERATURE
+        +SCIENTIFIC
+        +SCIENCE_FICTION
+        +POEM
+        +CULTURE
+    }
+
+    class BookEntity {
+        -Long id
+        -UUID bookId
+        -String isbn
+        -String bookName
+        -String author
+        -int publishYear
+        -BookType type
+        -boolean isBc
+        -boolean available
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+    }

@@ -16,6 +16,7 @@
     <description>libofalex service module</description>
     <modules>
         <module>service-auth</module>
+        <module>service-catalog</module>
     </modules>
 
 </project>
