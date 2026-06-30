@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -20,8 +21,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 @Testcontainers
@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class UserAuthRepositoryIT {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.5")
             .withDatabaseName("authdb_test")
             .withUsername("test")
             .withPassword("test");
@@ -46,7 +46,6 @@ class UserAuthRepositoryIT {
 
     @Autowired
     private UserAuthRepository repository;
-    private UUID userId = UUID.fromString("e0df422f-c7df-4b7a-9f12-9a6ca58455a9");
 
     @BeforeEach
     void clean() {
@@ -54,29 +53,29 @@ class UserAuthRepositoryIT {
     }
 
     @Test
-    @DisplayName("Kullanıcı kaydedilir ve username ile bulunur")
+    @DisplayName("User is saved and found by username")
     void shouldSaveAndFindByUsername() {
-        repository.save(buildEntity("emre", "emre@example.com"));
+        repository.save(buildEntity("testuser", "testuser@example.com"));
 
-        Optional<UserAuthEntity> result = repository.findByUsername("emre");
+        Optional<UserAuthEntity> result = repository.findByUsername("testuser");
 
         assertThat(result).isPresent();
-        assertThat(result.get().getEmail()).isEqualTo("emre@example.com");
+        assertThat(result.get().getEmail()).isEqualTo("testuser@example.com");
     }
 
     @Test
-    @DisplayName("Kullanıcı userId ile bulunur")
+    @DisplayName("User is found by userId")
     void shouldFindByUserId() {
-        UserAuthEntity saved = repository.save(buildEntity("emre", "emre@example.com"));
+        UserAuthEntity saved = repository.save(buildEntity("testuser", "testuser@example.com"));
 
         Optional<UserAuthEntity> result = repository.findByUserId(saved.getUserId());
 
         assertThat(result).isPresent();
-        assertThat(result.get().getUsername()).isEqualTo("emre");
+        assertThat(result.get().getUsername()).isEqualTo("testuser");
     }
 
     @Test
-    @DisplayName("Mevcut olmayan username → Optional.empty()")
+    @DisplayName("Non-existent username returns Optional.empty()")
     void shouldReturnEmptyForUnknownUsername() {
         Optional<UserAuthEntity> result = repository.findByUsername("ghost");
 
@@ -84,46 +83,35 @@ class UserAuthRepositoryIT {
     }
 
     @Test
-    @DisplayName("Aynı username ile iki kayıt → DataIntegrityViolationException")
+    @DisplayName("Two records with the same username throw a DataIntegrityViolationException")
     void shouldEnforceUniqueUsername() {
-        repository.save(buildEntity("emre", "emre@example.com"));
+        repository.save(buildEntity("testuser", "testuser@example.com"));
 
-        UserAuthEntity duplicate = buildEntity("emre", "other@example.com");
+        UserAuthEntity duplicate = buildEntity("testuser", "other@example.com");
 
         assertThatThrownBy(() -> repository.saveAndFlush(duplicate))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
-    @DisplayName("Aynı email ile iki kayıt → DataIntegrityViolationException")
+    @DisplayName("Two records with the same email throw a DataIntegrityViolationException")
     void shouldEnforceUniqueEmail() {
-        repository.save(buildEntity("emre", "emre@example.com"));
+        repository.save(buildEntity("testuser", "testuser@example.com"));
 
-        UserAuthEntity duplicate = buildEntity("emre2", "emre@example.com");
+        UserAuthEntity duplicate = buildEntity("emre2", "testuser@example.com");
 
         assertThatThrownBy(() -> repository.saveAndFlush(duplicate))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
-//    @Test
-//    @DisplayName("Kaydedilen kullanıcıda varsayılan account flag'leri true gelir")
-//    void shouldHaveDefaultAccountFlags() {
-//        UserAuthEntity saved = repository.save(buildEntity("emre", "emre@example.com"));
-//
-//        assertThat(saved.isAccountNonExpired()).isTrue();
-//        assertThat(saved.isAccountNonLocked()).isTrue();
-//        assertThat(saved.isCredentialsNonExpired()).isTrue();
-//        assertThat(saved.isEnabled()).isTrue();
-//    }
-
     @Test
-    @DisplayName("Kullanıcıya rol eklenir ve persist edilir")
+    @DisplayName("Role is added to the user and persisted")
     void shouldPersistRoles() {
-        UserAuthEntity entity = buildEntity("emre", "emre@example.com");
+        UserAuthEntity entity = buildEntity("testuser", "testuser@example.com");
         entity.getRoles().add(Role.ROLE_ADMIN_USER);
         UserAuthEntity saved = repository.save(entity);
 
-        Optional<UserAuthEntity> found = repository.findByUsername("emre");
+        Optional<UserAuthEntity> found = repository.findByUsername("testuser");
 
         assertThat(found).isPresent();
         assertThat(found.get().getRoles()).contains(Role.ROLE_CUSTOM_USER, Role.ROLE_ADMIN_USER);
@@ -132,8 +120,8 @@ class UserAuthRepositoryIT {
     private UserAuthEntity buildEntity(String username, String email) {
         UserAuthEntity e = new UserAuthEntity();
         e.setName("Test User");
+        e.setUserId(UUID.randomUUID());
         e.setUsername(username);
-        e.setUserId(userId);
         e.setPassword("$2a$10$hashedpassword");
         e.setEmail(email);
         e.setRoles(new HashSet<>(java.util.Set.of(Role.ROLE_CUSTOM_USER)));

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("SendPublicKeyHandler — Unit Tests")
 class SendPublicKeyHandlerTest {
@@ -28,7 +28,7 @@ class SendPublicKeyHandlerTest {
     }
 
     @Test
-    @DisplayName("Handler her zaman RSA256 algoritmasını set eder")
+    @DisplayName("Handler always sets the RSA256 algorithm")
     void shouldHardcodeAlgorithmAsRSA256() {
         SendPublicKey result = handler.handle(new SendPublicKey());
 
@@ -36,7 +36,7 @@ class SendPublicKeyHandlerTest {
     }
 
     @Test
-    @DisplayName("Public key port'tan alınır ve set edilir")
+    @DisplayName("Public key is retrieved from the port and set")
     void shouldReturnPublicKeyFromPort() {
         SendPublicKey result = handler.handle(new SendPublicKey());
 
@@ -46,7 +46,7 @@ class SendPublicKeyHandlerTest {
     }
 
     @Test
-    @DisplayName("Algorithm ve publicKey birlikte dolu olarak döner")
+    @DisplayName("Algorithm and publicKey are both populated in the response")
     void shouldReturnBothFieldsPopulated() {
         SendPublicKey result = handler.handle(new SendPublicKey());
 

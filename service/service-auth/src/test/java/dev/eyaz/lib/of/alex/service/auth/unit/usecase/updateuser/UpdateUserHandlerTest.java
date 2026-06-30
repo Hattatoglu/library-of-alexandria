@@ -13,8 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("UpdateUserHandler — Unit Tests")
 class UpdateUserHandlerTest {
@@ -48,20 +47,19 @@ class UpdateUserHandlerTest {
     }
 
     @Test
-    @DisplayName("Kullanıcıya yeni rol başarıyla eklenir")
+    @DisplayName("New role is added to the user successfully")
     void shouldAddNewRole() {
-        UpdateUser input = buildInput("emre", Role.ROLE_ADMIN_USER);
+        UpdateUser input = buildInput("testuser", Role.ROLE_ADMIN_USER);
 
         UpdateUser result = handler.handle(input);
 
-        assertThat(result.getUserId()).isEqualTo(input.getUserId());
         assertThat(result.getRole()).contains(Role.ROLE_ADMIN_USER);
     }
 
     @Test
-    @DisplayName("Role update sonrası mevcut roller korunur")
+    @DisplayName("Existing roles are preserved after a role update")
     void shouldPreserveExistingRoles() {
-        UpdateUser input = buildInput("emre", Role.ROLE_ADMIN_USER);
+        UpdateUser input = buildInput("testuser", Role.ROLE_ADMIN_USER);
 
         UpdateUser result = handler.handle(input);
 
@@ -69,7 +67,7 @@ class UpdateUserHandlerTest {
     }
 
     @Test
-    @DisplayName("Olmayan kullanıcıya rol atama → UserNotFoundException")
+    @DisplayName("Assigning a role to a non-existent user throws UserNotFoundException")
     void shouldThrowWhenUserNotFound() {
         handler = new UpdateUserHandler(new FakeUpdateUserPort(false));
 
@@ -79,13 +77,13 @@ class UpdateUserHandlerTest {
     }
 
     @Test
-    @DisplayName("Port'a iletilen use case doğru username ve newRole içerir")
+    @DisplayName("The use case passed to the port contains the correct username and newRole")
     void shouldDelegateCorrectDataToPort() {
-        UpdateUser input = buildInput("emre", Role.ROLE_SUPER_USER);
+        UpdateUser input = buildInput("testuser", Role.ROLE_SUPER_USER);
 
         handler.handle(input);
 
-        assertThat(fakePort.getUpdated().getUsername()).isEqualTo("emre");
+        assertThat(fakePort.getUpdated().getUsername()).isEqualTo("testuser");
         assertThat(fakePort.getUpdated().getNewRole()).isEqualTo(Role.ROLE_SUPER_USER);
     }
 

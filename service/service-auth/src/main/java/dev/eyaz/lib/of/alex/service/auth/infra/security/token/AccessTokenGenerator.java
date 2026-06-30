@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class JwtTokenGenerator implements JwtTokenService{
+public class AccessTokenGenerator implements AccessTokenService {
 
     private final JwtProperties jwtProperties;
 
@@ -23,13 +23,12 @@ public class JwtTokenGenerator implements JwtTokenService{
     private RSAPublicKey publicKey;
     private String publicKeyPem;
 
-    public JwtTokenGenerator(JwtProperties jwtProperties) {
+    public AccessTokenGenerator(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
         this.privateKey  = RsaKeyLoader.loadPrivateKey(jwtProperties.privateKeyPath());
         this.publicKey   = RsaKeyLoader.loadPublicKey(jwtProperties.publicKeyPath());
         this.publicKeyPem = RsaKeyLoader.readPem(jwtProperties.publicKeyPath());
     }
-
 
     @Override
     public String generateAccessToken(UUID userId, String username, List<String> roles, Date now, Date expiry) {
@@ -44,51 +43,12 @@ public class JwtTokenGenerator implements JwtTokenService{
                 .compact();
     }
 
-    @Override
-    public String generateRefreshToken(UUID userId, Date now, Date expiry) {
 
-        return Jwts.builder()
-                .subject(userId.toString())
-                .claim("type", "refresh")
-                .issuedAt(now)
-                .expiration(expiry)
-                .signWith(privateKey)
-                .compact();
-    }
 
-    @Override
-    public UUID extractUserIdFromRefreshToken(String token) {
-        Claims claims = parseClaims(token);
-        return UUID.fromString(claims.getSubject());
-    }
-
-    @Override
-    public boolean validateRefreshToken(String token) {
-        try {
-            Claims claims = parseClaims(token);
-            return "refresh".equals(claims.get("type", String.class));
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    @Override
-    public LocalDateTime getRefreshTokenExpiry() {
-        return LocalDateTime.now().plusSeconds(
-                jwtProperties.refreshTokenExpirationMs() / 1000
-        );
-    }
 
     @Override
     public String getPublicKeyPem() {
         return publicKeyPem;
     }
 
-    private Claims parseClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(publicKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
 }

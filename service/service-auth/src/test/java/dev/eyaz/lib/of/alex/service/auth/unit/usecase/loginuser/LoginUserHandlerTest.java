@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("LoginUserHandler — Unit Tests")
 class LoginUserHandlerTest {
@@ -54,7 +54,7 @@ class LoginUserHandlerTest {
     }
 
     @Test
-    @DisplayName("Login sonrası access ve refresh token üretilir")
+    @DisplayName("Login generates both access and refresh tokens")
     void shouldGenerateBothTokens() {
         LoginUser result = handler.handle(buildInput());
 
@@ -63,7 +63,7 @@ class LoginUserHandlerTest {
     }
 
     @Test
-    @DisplayName("Refresh token persistence port'a iletilir")
+    @DisplayName("Refresh token is delegated to the persistence port")
     void shouldPersistRefreshToken() {
         handler.handle(buildInput());
 
@@ -72,7 +72,7 @@ class LoginUserHandlerTest {
     }
 
     @Test
-    @DisplayName("Token expiry tarihleri set edilir")
+    @DisplayName("Token expiry timestamps are set")
     void shouldSetTokenExpiries() {
         LoginUser result = handler.handle(buildInput());
 
@@ -81,7 +81,7 @@ class LoginUserHandlerTest {
     }
 
     @Test
-    @DisplayName("Token'lar birbirinden farklıdır")
+    @DisplayName("Access and refresh tokens are different")
     void accessAndRefreshTokensShouldBeDifferent() {
         LoginUser result = handler.handle(buildInput());
 
@@ -90,7 +90,7 @@ class LoginUserHandlerTest {
 
     private LoginUser buildInput() {
         LoginUser u = new LoginUser();
-        u.setUsername("emre");
+        u.setUsername("testuser");
         u.setUserId(UUID.randomUUID());
         u.setRole(Set.of(Role.ROLE_CUSTOM_USER));
         return u;

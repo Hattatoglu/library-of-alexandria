@@ -7,6 +7,7 @@ import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.RefreshTokenEntity
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.RefreshTokenRepository;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -22,7 +23,12 @@ public class RefreshTokenUseCasePersistenceTokenPortAdapter implements RefreshTo
     public RefreshTokenUseCase findRefreshTokenByToken(RefreshTokenUseCase useCase) {
         Optional<RefreshTokenEntity> optional = refreshTokenRepository.findByToken(useCase.getRefreshToken());
         if(optional.isPresent()) {
-            useCase.setUserId(optional.get().getUserId());
+            RefreshTokenEntity entity = optional.get();
+            if (entity.getExpiresAt().isBefore(LocalDateTime.now())) {
+                refreshTokenRepository.delete(entity);
+                throw new InvalidTokenException("Refresh token expired");
+            }
+            useCase.setUserId(entity.getUserId());
         } else {
             throw new InvalidTokenException("Token Not Found : "+ useCase.getRefreshToken());
         }

@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.service.auth.unit.usecase.createuser;
+package dev.eyaz.lib.of.alex.service.auth.unit.usecase.signupser;
 
 import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 import dev.eyaz.lib.of.alex.service.auth.core.exception.UserAlreadyExistsException;
@@ -17,8 +17,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@DisplayName("CreateUserHandler — Unit Tests")
-class CreateUserHandlerTest {
+@DisplayName("SignUpUserHandler — Unit Tests")
+class SignUpUserHandlerTest {
 
     // ── Fake port — no mocks needed ─────────────────────────────────────────
     private static class FakeSignUpUserPersistenceAuthPort implements SignUpUserPersistenceAuthPort {

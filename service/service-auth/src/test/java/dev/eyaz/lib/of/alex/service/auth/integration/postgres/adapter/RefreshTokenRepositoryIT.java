@@ -1,6 +1,9 @@
 package dev.eyaz.lib.of.alex.service.auth.integration.postgres.adapter;
 
 import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
+import dev.eyaz.lib.of.alex.service.auth.core.exception.InvalidTokenException;
+import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.handler.RefreshTokenUseCase;
+import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.port.RefreshTokenUseCasePersistenceTokenPort;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.RefreshTokenEntity;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.model.UserAuthEntity;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.RefreshTokenRepository;
@@ -9,35 +12,43 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
-@DataJpaTest
-@Testcontainers
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DisplayName("RefreshTokenRepository — Integration Tests")
+/**
+ * Verifies the explicit expiry check in RefreshTokenRepositoryIT.
+ *
+ * Refresh tokens are opaque (see ADR-001 addendum) and carry no claims of their own, unlike
+ * a JWT whose exp claim is rejected automatically by the parser. Expiry must therefore be
+ * checked explicitly against the persisted expires_at column — this test exists specifically
+ * to guard that check, since a regression here would let expired tokens be rotated forever.
+ *
+ * @SpringBootTest (rather than @DataJpaTest) is required here because the behavior under
+ * test lives in the adapter bean itself, not just the JPA repository.
+ */
+@SpringBootTest
+@ActiveProfiles("test")
+@DisplayName("RefreshTokenRepositoryIT — Integration Tests")
 class RefreshTokenRepositoryIT {
 
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.5")
             .withDatabaseName("authdb_test")
             .withUsername("test")
             .withPassword("test");
+
+    static {
+        postgres.start();
+    }
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -48,74 +59,67 @@ class RefreshTokenRepositoryIT {
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
     }
 
+    @Autowired private RefreshTokenUseCasePersistenceTokenPort adapter;
     @Autowired private RefreshTokenRepository tokenRepository;
     @Autowired private UserAuthRepository userRepository;
 
-    private UserAuthEntity savedUser;
-    private UUID userId = UUID.fromString("e0df422f-c7df-4b7a-9f12-9a6ca58455a9");
+    private UUID userId;
 
     @BeforeEach
     void setUp() {
         tokenRepository.deleteAll();
         userRepository.deleteAll();
-        savedUser = userRepository.save(buildUser());
+        userId = userRepository.save(buildUser()).getUserId();
     }
 
     @Test
-    @DisplayName("Refresh token kaydedilir ve token string ile bulunur")
-    void shouldSaveAndFindByToken() {
-        tokenRepository.save(buildToken("token-abc", savedUser.getUserId(), future()));
+    @DisplayName("A non-expired token is found and its userId is resolved")
+    void shouldResolveUserIdForValidToken() {
+        tokenRepository.save(buildToken("valid-token", userId, LocalDateTime.now().plusDays(7)));
 
-        Optional<RefreshTokenEntity> found = tokenRepository.findByToken("token-abc");
+        RefreshTokenUseCase result = adapter.findRefreshTokenByToken(buildUseCase("valid-token"));
 
-        assertThat(found).isPresent();
-        assertThat(found.get().getUserId()).isEqualTo(savedUser.getUserId());
+        assertThat(result.getUserId()).isEqualTo(userId);
     }
 
     @Test
-    @DisplayName("Mevcut olmayan token → Optional.empty()")
-    void shouldReturnEmptyForUnknownToken() {
-        Optional<RefreshTokenEntity> found = tokenRepository.findByToken("non-existent");
+    @DisplayName("An expired token throws InvalidTokenException")
+    void shouldThrowForExpiredToken() {
+        tokenRepository.save(buildToken("expired-token", userId, LocalDateTime.now().minusSeconds(1)));
 
-        assertThat(found).isEmpty();
+        System.out.println(tokenRepository.findByToken("expired-token"));
+
+        assertThatThrownBy(() -> adapter.findRefreshTokenByToken(buildUseCase("expired-token")))
+                .isInstanceOf(InvalidTokenException.class)
+                .hasMessageContaining("expired");
     }
 
     @Test
-    @DisplayName("Token silinir ve artık bulunamaz")
-    void shouldDeleteByToken() {
-        tokenRepository.save(buildToken("token-to-delete", savedUser.getUserId(), future()));
+    @DisplayName("An expired token is deleted from the database when rejected")
+    void shouldDeleteExpiredTokenOnRejection() {
+        tokenRepository.save(buildToken("expired-token", userId, LocalDateTime.now().minusSeconds(1)));
 
-        tokenRepository.deleteByToken("token-to-delete");
+        assertThatThrownBy(() -> adapter.findRefreshTokenByToken(buildUseCase("expired-token")));
 
-        assertThat(tokenRepository.findByToken("token-to-delete")).isEmpty();
+        assertThat(tokenRepository.findByToken("expired-token")).isEmpty();
     }
 
-//    @Test
-//    @DisplayName("UserId ile kullanıcının tüm token'ları silinir")
-//    void shouldDeleteAllTokensByUserId() {
-//        tokenRepository.save(buildToken("token-1", savedUser.getUserId(), future()));
-//        tokenRepository.save(buildToken("token-2", savedUser.getUserId(), future()));
-//
-//        tokenRepository.deleteByUserId(savedUser.getUserId());
-//
-//        assertThat(tokenRepository.findByToken("token-1")).isEmpty();
-//        assertThat(tokenRepository.findByToken("token-2")).isEmpty();
-//    }
-
     @Test
-    @DisplayName("Aynı token string iki kez kaydedilmeye çalışılırsa hata fırlatılır")
-    void shouldEnforceUniqueToken() {
-        tokenRepository.save(buildToken("duplicate-token", savedUser.getUserId(), future()));
+    @DisplayName("A token expiring exactly now is treated as expired")
+    void shouldTreatTokenExpiringNowAsExpired() {
+        // expiresAt strictly before "now" at check-time — emulate the boundary by using a
+        // timestamp a moment in the past relative to when the adapter performs its check.
+        tokenRepository.save(buildToken("boundary-token", userId, LocalDateTime.now().minusNanos(1)));
 
-        RefreshTokenEntity duplicate = buildToken("duplicate-token", savedUser.getUserId(), future());
-
-        assertThatThrownBy(() -> tokenRepository.saveAndFlush(duplicate))
-                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> adapter.findRefreshTokenByToken(buildUseCase("boundary-token")))
+                .isInstanceOf(InvalidTokenException.class);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
-    private LocalDateTime future() {
-        return LocalDateTime.now().plusDays(7);
+    private RefreshTokenUseCase buildUseCase(String token) {
+        RefreshTokenUseCase uc = new RefreshTokenUseCase();
+        uc.setRefreshToken(token);
+        return uc;
     }
 
     private RefreshTokenEntity buildToken(String token, UUID userId, LocalDateTime expiresAt) {
@@ -128,11 +132,11 @@ class RefreshTokenRepositoryIT {
 
     private UserAuthEntity buildUser() {
         UserAuthEntity u = new UserAuthEntity();
-        u.setName("Test");
-        u.setUserId(userId);
-        u.setUsername("test");
+        u.setName("Test User");
+        u.setUserId(UUID.randomUUID());
+        u.setUsername("testuser-" + UUID.randomUUID());
         u.setPassword("$2a$10$hashed");
-        u.setEmail("test@main.com");
+        u.setEmail(UUID.randomUUID() + "@example.com");
         u.setRoles(new HashSet<>(Set.of(Role.ROLE_CUSTOM_USER)));
         return u;
     }

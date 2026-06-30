@@ -4,7 +4,8 @@ import dev.eyaz.lib.of.alex.service.auth.core.enums.Role;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginUser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserSecurityPort;
 import dev.eyaz.lib.of.alex.service.auth.infra.security.config.JwtProperties;
-import dev.eyaz.lib.of.alex.service.auth.infra.security.token.JwtTokenService;
+import dev.eyaz.lib.of.alex.service.auth.infra.security.token.AccessTokenService;
+import dev.eyaz.lib.of.alex.service.auth.infra.security.token.RefreshTokenService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -14,11 +15,13 @@ import java.util.Date;
 @Component
 public class LoginUserSecurityPortAdapter implements LoginUserSecurityPort {
 
-    private final JwtTokenService jwtTokenService;
+    private final AccessTokenService accessTokenService;
+    private final RefreshTokenService refreshTokenService;
     private final JwtProperties jwtProperties;
 
-    public LoginUserSecurityPortAdapter(JwtTokenService jwtTokenService, JwtProperties jwtProperties) {
-        this.jwtTokenService = jwtTokenService;
+    public LoginUserSecurityPortAdapter(AccessTokenService accessTokenService, RefreshTokenService refreshTokenService, JwtProperties jwtProperties) {
+        this.accessTokenService = accessTokenService;
+        this.refreshTokenService = refreshTokenService;
         this.jwtProperties = jwtProperties;
     }
 
@@ -28,16 +31,13 @@ public class LoginUserSecurityPortAdapter implements LoginUserSecurityPort {
         Date accessExpiry = new Date(now.getTime() + jwtProperties.accessTokenExpirationMs());
         Date refreshExpiry = new Date(now.getTime() + jwtProperties.refreshTokenExpirationMs());
 
-        String accessToken = jwtTokenService.generateAccessToken(
+        String accessToken = accessTokenService.generateAccessToken(
                 usecase.getUserId(),
                 usecase.getUsername(),
                 usecase.getRole().stream().map(Role::name).toList(),
                 now,
                 accessExpiry);
-        String refreshToken = jwtTokenService.generateRefreshToken(
-                usecase.getUserId(),
-                now,
-                refreshExpiry);
+        String refreshToken = refreshTokenService.generateRefreshToken();
         usecase.setAccessToken(accessToken);
         usecase.setRefreshToken(refreshToken);
         usecase.setAccessTokenExpiresAt(LocalDateTime.ofInstant(

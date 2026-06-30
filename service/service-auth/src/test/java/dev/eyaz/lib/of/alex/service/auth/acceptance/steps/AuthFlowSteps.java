@@ -36,7 +36,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class AuthFlowSteps {
 
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.5")
+    // NOTE: @Testcontainers + @Container is a JUnit Jupiter extension and does NOT manage
+    // the container lifecycle for Cucumber glue classes, since Cucumber instantiates glue
+    // classes through its own lifecycle, not JUnit's. The container must be started manually,
+    // before @DynamicPropertySource resolves its connection properties — otherwise
+    // postgres.getJdbcUrl() is called on a container that was never started, which throws
+    // "Mapped port can only be obtained after the container is started".
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
             .withDatabaseName("authdb_test")
             .withUsername("test")
             .withPassword("test");
@@ -251,7 +257,7 @@ public class AuthFlowSteps {
     @Then("the response should contain the correct user details")
     public void theResponseShouldContainTheCorrectUserDetails() throws Exception {
         String body = lastResult.getResponse().getContentAsString();
-        assertThat(body).contains("emre");
+        assertThat(body).contains("testuser");
     }
 
     @Then("the user's roles should contain {string}")

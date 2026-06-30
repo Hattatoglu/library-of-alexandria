@@ -6,26 +6,26 @@ Feature: Authentication Flows
     Given the system is ready
 
   Scenario: A new user signs up successfully
-    When a sign-up request is sent with username "emre"
+    When a sign-up request is sent with username "testuser"
     Then the response status should be 201
     And the user should be persisted in the database
 
   Scenario: Signing up with an already registered username
-    Given a user is already registered with username "emre"
-    When a sign-up request is sent with username "emre"
+    Given a user is already registered with username "testuser"
+    When a sign-up request is sent with username "testuser"
     Then the response status should be 409
     And the response should contain the error type "user-already-exists"
 
   Scenario: A registered user logs in successfully
-    Given a user is already registered with username "emre"
-    When a login request is sent with username "emre" and password "Secret123!"
+    Given a user is already registered with username "testuser"
+    When a login request is sent with username "testuser" and password "Secret123!"
     Then the response status should be 200
     And the response should contain an HttpOnly access_token cookie
     And the response should contain an HttpOnly refresh_token cookie
 
   Scenario: Logging in with an incorrect password
-    Given a user is already registered with username "test"
-    When a login request is sent with username "test" and password "WrongPass!"
+    Given a user is already registered with username "testuser"
+    When a login request is sent with username "testuser" and password "WrongPass!"
     Then the response status should be 401
     And the response should contain the error type "invalid-credentials"
 
@@ -34,7 +34,7 @@ Feature: Authentication Flows
     Then the response status should be 401
 
   Scenario: Access token is refreshed with a valid refresh token
-    Given a user with username "test" is logged in
+    Given a user with username "testuser" is logged in
     When a request is sent to the refresh endpoint
     Then the response status should be 200
     And the response should contain a new HttpOnly access_token cookie
@@ -46,7 +46,7 @@ Feature: Authentication Flows
     Then the response status should be 400
 
   Scenario: A logged-in user logs out successfully
-    Given a user with username "test" is logged in
+    Given a user with username "testuser" is logged in
     When a logout request is sent
     Then the response status should be 204
     And the cookies should be cleared
@@ -58,8 +58,8 @@ Feature: Authentication Flows
     And the algorithm should be "RSA256"
 
   Scenario: A registered user is found by username
-    Given a user is already registered with username "emre"
-    When a request is sent to the searchuser endpoint with username "emre"
+    Given a user is already registered with username "testuser"
+    When a request is sent to the searchuser endpoint with username "testuser"
     Then the response status should be 200
     And the response should contain the correct user details
 
@@ -69,7 +69,7 @@ Feature: Authentication Flows
     And the response should contain the error type "user-not-found"
 
   Scenario: A new role is assigned to a user
-    Given a user is already registered with username "test"
-    When the role "ADMIN" is assigned to user "test"
+    Given a user is already registered with username "testuser"
+    When the role "ADMIN" is assigned to user "testuser"
     Then the response status should be 200
     And the user's roles should contain "ADMIN"

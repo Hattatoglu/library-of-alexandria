@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("RefreshTokenUseCaseHandler — Unit Tests")
 class RefreshTokenUseCaseHandlerTest {
@@ -60,7 +59,7 @@ class RefreshTokenUseCaseHandlerTest {
         @Override
         public RefreshTokenUseCase findUserDetails(RefreshTokenUseCase useCase) {
             if (!userExists) throw new UserNotFoundException("User not found: " + useCase.getUserId());
-            useCase.setUsername("emre");
+            useCase.setUsername("testuser");
             useCase.setRoles(Set.of(Role.ROLE_CUSTOM_USER));
             return useCase;
         }
@@ -92,7 +91,7 @@ class RefreshTokenUseCaseHandlerTest {
     }
 
     @Test
-    @DisplayName("Geçerli token ile yeni access ve refresh token üretilir")
+    @DisplayName("Valid token generates new access and refresh tokens")
     void shouldRotateTokensSuccessfully() {
         RefreshTokenUseCase input = buildInput("old-refresh-token");
 
@@ -103,7 +102,7 @@ class RefreshTokenUseCaseHandlerTest {
     }
 
     @Test
-    @DisplayName("Token rotation: eski token silinir, yeni token kaydedilir")
+    @DisplayName("Token rotation: old token is deleted, new token is saved")
     void shouldDeleteOldAndSaveNewToken() {
         RefreshTokenUseCase input = buildInput("old-refresh-token");
 
@@ -114,7 +113,7 @@ class RefreshTokenUseCaseHandlerTest {
     }
 
     @Test
-    @DisplayName("Bulunamayan token → InvalidTokenException")
+    @DisplayName("Token not found throws InvalidTokenException")
     void shouldThrowWhenTokenNotFound() {
         handler = new RefreshTokenUseCaseHandler(
                 new FakeTokenPersistencePort(false, userId),
@@ -127,7 +126,7 @@ class RefreshTokenUseCaseHandlerTest {
     }
 
     @Test
-    @DisplayName("Token sahibi kullanıcı bulunamazsa → UserNotFoundException")
+    @DisplayName("Throws UserNotFoundException when the token owner cannot be found")
     void shouldThrowWhenUserNotFound() {
         handler = new RefreshTokenUseCaseHandler(
                 new FakeTokenPersistencePort(true, userId),
@@ -140,7 +139,7 @@ class RefreshTokenUseCaseHandlerTest {
     }
 
     @Test
-    @DisplayName("Yeni token expiry tarihleri gelecekte olmalıdır")
+    @DisplayName("New token expiry timestamps must be in the future")
     void newTokensShouldHaveFutureExpiry() {
         RefreshTokenUseCase result = handler.handle(buildInput("token"));
 

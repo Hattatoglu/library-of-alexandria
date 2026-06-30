@@ -46,11 +46,7 @@ public class SignUpUserPersistenceAuthPortAdapter implements SignUpUserPersisten
         entity.setCredentialsNonExpired(usecase.isCredentialsNonExpired());
         entity.setEnabled(usecase.isEnabled());
 
-        try {
-            userAuthRepository.save(entity);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
+        userAuthRepository.save(entity);
 
         return usecase;
     }
