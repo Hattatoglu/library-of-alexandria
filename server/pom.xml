@@ -15,7 +15,7 @@
     <name>server</name>
     <description>library of alexandria application server modules</description>
     <modules>
-        <module>server-postgres</module>
+        <module>server-gatway</module>
     </modules>
 
 </project>

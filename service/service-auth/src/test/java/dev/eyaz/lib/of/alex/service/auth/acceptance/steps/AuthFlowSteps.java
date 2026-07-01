@@ -42,7 +42,7 @@ public class AuthFlowSteps {
     // before @DynamicPropertySource resolves its connection properties — otherwise
     // postgres.getJdbcUrl() is called on a container that was never started, which throws
     // "Mapped port can only be obtained after the container is started".
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17")
             .withDatabaseName("authdb_test")
             .withUsername("test")
             .withPassword("test");

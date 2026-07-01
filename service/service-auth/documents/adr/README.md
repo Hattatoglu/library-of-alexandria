@@ -8,11 +8,11 @@ trade-offs.
 
 | ID | Title | Status |
 |----|-------|--------|
-| [ADR-001](./ADR-001-asymmetric-jwt-rs256.md) | Asymmetric JWT (RS256) for token signing | Accepted |
-| [ADR-002](./ADR-002-httponly-cookie-token-delivery.md) | HttpOnly cookie for token delivery | Accepted |
-| [ADR-003](./ADR-003-refresh-token-rotation.md) | Refresh token rotation strategy | Accepted |
-| [ADR-004](./ADR-004-refresh-token-postgres-storage.md) | Refresh token storage in PostgreSQL | Accepted |
-| [ADR-005](./ADR-005-hexagonal-usecase-handler.md) | Hexagonal architecture + UseCase/Handler pattern | Accepted |
+| [ADR-001](ADR-001-asymmetric-jwt-rs256.md) | Asymmetric JWT (RS256) for token signing | Accepted |
+| [ADR-002](ADR-002-httponly-cookie-token-delivery.md) | HttpOnly cookie for token delivery | Accepted |
+| [ADR-003](ADR-003-refresh-token-rotation.md) | Refresh token rotation strategy | Accepted |
+| [ADR-004](ADR-004-refresh-token-postgres-storage.md) | Refresh token storage in PostgreSQL | Accepted |
+| [ADR-005](ADR-005-hexagonal-usecase-handler.md) | Hexagonal architecture + UseCase/Handler pattern | Accepted |
 
 ## Dependency Map
 

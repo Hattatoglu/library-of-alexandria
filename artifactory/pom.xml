@@ -17,6 +17,7 @@
     <modules>
         <module>lib-domain</module>
         <module>lib-infra-web</module>
+        <module>lib-db-postgres</module>
     </modules>
 
 </project>

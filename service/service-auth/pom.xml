@@ -22,6 +22,11 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>dev.eyaz.lib.of.alex.artifactory.lib.db.postgres</groupId>
+            <artifactId>lib-db-postgres</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>dev.eyaz.lib.of.alex.artifactory.lib.infra</groupId>
             <artifactId>lib-infra-web</artifactId>
             <version>1.0-SNAPSHOT</version>
@@ -54,13 +59,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
-        <!-- Postgres -->
-        <dependency>
-            <groupId>dev.eyaz.lib.of.alex.server.postgres</groupId>
-            <artifactId>server-postgres</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Flyway -->
