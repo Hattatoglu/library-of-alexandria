@@ -1,0 +1,14 @@
+%% Reflects ADR-002: access token is not revoked on logout, no blacklist check.
+%% Validation is a pure signature check against the cached public key.
+sequenceDiagram
+    autonumber
+    actor User
+    participant Gateway
+
+    User            ->>  Gateway        :   HTTP GET http://server-gateway/api/v1/auth/verify <br/>(with Access Token)
+    Gateway         ->>  Gateway        :   verify signature with cached public key
+    alt Unsuccessful
+        Gateway     -->> User           :   HTTP 401 Unauthorized
+    else Successful
+        Gateway     -->> User           :   HTTP 200 OK
+    end
