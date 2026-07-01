@@ -1,0 +1,47 @@
+graph TB
+    Client["Client"]
+    Nginx["Nginx<br/>(reverse proxy / TLS termination)"]
+
+    subgraph Gateway["API Gateway (Spring WebFlux)"]
+        direction TB
+        JWTFilter["JWT Validation<br/>(WebFilter)"]
+        RateLimit["Rate Limiter<br/>(token bucket)"]
+        CircuitBreaker["Circuit Breaker<br/>(per downstream service)"]
+        LoadBalancer["Load Balancer<br/>(round robin, static config)"]
+    end
+
+    ServiceAuth["ServiceAuth<br/>(Spring MVC, Postgres)"]
+    Catalog1["Catalog - instance 1"]
+    Catalog2["Catalog - instance 2"]
+    Loan1["Loan - instance 1"]
+    Loan2["Loan - instance 2"]
+
+    Redis[("Redis<br/>(rate limit state)")]
+    Prometheus["Prometheus"]
+    Grafana["Grafana"]
+
+    Client --> Nginx
+    Nginx --> Gateway
+
+    JWTFilter -->|"fetch public key<br/>(cached, JWKS-style)"| ServiceAuth
+    JWTFilter --> RateLimit
+    RateLimit <-->|"INCR / EXPIRE"| Redis
+    RateLimit --> CircuitBreaker
+    CircuitBreaker --> LoadBalancer
+
+    LoadBalancer -->|"/catalog/**"| Catalog1
+    LoadBalancer -->|"/catalog/**"| Catalog2
+    LoadBalancer -->|"/loans/**"| Loan1
+    LoadBalancer -->|"/loans/**"| Loan2
+
+    ServiceAuth -.->|"logout: delete refresh token"| ServiceAuth
+
+    Gateway -.->|"/actuator/prometheus"| Prometheus
+    ServiceAuth -.->|"/actuator/prometheus"| Prometheus
+    Catalog1 -.->|"/actuator/prometheus"| Prometheus
+    Loan1 -.->|"/actuator/prometheus"| Prometheus
+    Prometheus --> Grafana
+
+    style Gateway fill:#1e293b,stroke:#64748b,color:#f1f5f9
+    style Redis fill:#7f1d1d,stroke:#dc2626,color:#fef2f2
+    style ServiceAuth fill:#1e3a5f,stroke:#3b82f6,color:#eff6ff
