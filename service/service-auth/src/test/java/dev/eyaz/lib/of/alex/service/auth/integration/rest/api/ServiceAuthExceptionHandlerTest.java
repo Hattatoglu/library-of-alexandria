@@ -1,7 +1,9 @@
 package dev.eyaz.lib.of.alex.service.auth.integration.rest.api;
 
 import dev.eyaz.lib.of.alex.service.auth.core.exception.*;
+import dev.eyaz.lib.of.alex.service.auth.infra.observability.AuthMetrics;
 import dev.eyaz.lib.of.alex.service.auth.infra.rest.exception.ServiceAuthExceptionHandler;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +19,7 @@ class ServiceAuthExceptionHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ServiceAuthExceptionHandler();
+        handler = new ServiceAuthExceptionHandler(new AuthMetrics(new SimpleMeterRegistry()));
     }
 
     @Test

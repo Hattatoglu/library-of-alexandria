@@ -5,6 +5,8 @@ import dev.eyaz.lib.of.alex.service.auth.core.exception.UserNotFoundException;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.finduser.handler.FindUser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.finduser.handler.FindUserHandler;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.finduser.port.FindUserPersistenceAuthPort;
+import dev.eyaz.lib.of.alex.service.auth.infra.observability.AuthMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,11 +39,12 @@ class FindUserHandlerTest {
 
     private FakeFindUserPort fakePort;
     private FindUserHandler handler;
+    private AuthMetrics authMetrics = new AuthMetrics(new SimpleMeterRegistry());
 
     @BeforeEach
     void setUp() {
         fakePort = new FakeFindUserPort(true);
-        handler  = new FindUserHandler(fakePort);
+        handler  = new FindUserHandler(fakePort, authMetrics);
     }
 
     @Test
@@ -60,7 +63,7 @@ class FindUserHandlerTest {
     @Test
     @DisplayName("User not found throws UserNotFoundException")
     void shouldThrowWhenUserNotFound() {
-        handler = new FindUserHandler(new FakeFindUserPort(false));
+        handler = new FindUserHandler(new FakeFindUserPort(false), authMetrics);
 
         FindUser input = new FindUser();
         input.setUsername("ghost");

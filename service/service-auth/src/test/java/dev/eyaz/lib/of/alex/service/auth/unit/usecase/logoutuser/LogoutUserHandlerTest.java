@@ -3,6 +3,8 @@ package dev.eyaz.lib.of.alex.service.auth.unit.usecase.logoutuser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.logoutuser.handler.LogoutUser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.logoutuser.handler.LogoutUserHandler;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.logoutuser.port.LogoutUserPersistenceTokenPort;
+import dev.eyaz.lib.of.alex.service.auth.infra.observability.AuthMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,11 +30,12 @@ class LogoutUserHandlerTest {
 
     private FakeLogoutPort fakePort;
     private LogoutUserHandler handler;
+    private AuthMetrics authMetrics = new AuthMetrics(new SimpleMeterRegistry());
 
     @BeforeEach
     void setUp() {
         fakePort = new FakeLogoutPort();
-        handler  = new LogoutUserHandler(fakePort);
+        handler  = new LogoutUserHandler(fakePort, authMetrics);
     }
 
     @Test

@@ -5,6 +5,8 @@ import dev.eyaz.lib.of.alex.service.auth.core.exception.UserNotFoundException;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.updateuser.handler.UpdateUser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.updateuser.handler.UpdateUserHandler;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.updateuser.port.UpdateUserPersistAuthPort;
+import dev.eyaz.lib.of.alex.service.auth.infra.observability.AuthMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,11 +41,12 @@ class UpdateUserHandlerTest {
 
     private FakeUpdateUserPort fakePort;
     private UpdateUserHandler handler;
+    private AuthMetrics authMetrics = new AuthMetrics(new SimpleMeterRegistry());
 
     @BeforeEach
     void setUp() {
         fakePort = new FakeUpdateUserPort(true);
-        handler  = new UpdateUserHandler(fakePort);
+        handler  = new UpdateUserHandler(fakePort, authMetrics);
     }
 
     @Test
@@ -69,7 +72,7 @@ class UpdateUserHandlerTest {
     @Test
     @DisplayName("Assigning a role to a non-existent user throws UserNotFoundException")
     void shouldThrowWhenUserNotFound() {
-        handler = new UpdateUserHandler(new FakeUpdateUserPort(false));
+        handler = new UpdateUserHandler(new FakeUpdateUserPort(false), authMetrics);
 
         assertThatThrownBy(() -> handler.handle(buildInput("ghost", Role.ROLE_ADMIN_USER)))
                 .isInstanceOf(UserNotFoundException.class)

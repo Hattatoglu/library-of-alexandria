@@ -12,6 +12,8 @@ import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.request.LoginUserRequest
 import dev.eyaz.lib.of.alex.service.auth.infra.rest.dto.response.LoginUserResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/auth")
 public class LoginController {
 
+    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
     private final AuthenticationManager authenticationManager;
     private final CookieProvider cookieProvider;
 
@@ -55,6 +58,7 @@ public class LoginController {
                             request.getUsername(),
                             request.getPassword()));
         } catch (AuthenticationException ex) {
+            log.warn("action=login_authentication_failed username={}", request.getUsername());
             throw new InvalidCredentialsException("Invalid username or password");
         }
 

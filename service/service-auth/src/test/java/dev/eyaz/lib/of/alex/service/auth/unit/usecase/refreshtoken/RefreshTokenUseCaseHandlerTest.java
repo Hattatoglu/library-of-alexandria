@@ -8,6 +8,8 @@ import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.handler.Ref
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.port.RefreshTokenUseCasePersistenceAuthPort;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.port.RefreshTokenUseCasePersistenceTokenPort;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.refreshtoken.port.RefreshTokenUseCaseSecurityPort;
+import dev.eyaz.lib.of.alex.service.auth.infra.observability.AuthMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -79,6 +81,7 @@ class RefreshTokenUseCaseHandlerTest {
     private final UUID userId = UUID.randomUUID();
     private FakeTokenPersistencePort fakeTokenPort;
     private RefreshTokenUseCaseHandler handler;
+    private AuthMetrics authMetrics = new AuthMetrics(new SimpleMeterRegistry());
 
     @BeforeEach
     void setUp() {
@@ -86,7 +89,8 @@ class RefreshTokenUseCaseHandlerTest {
         handler = new RefreshTokenUseCaseHandler(
                 fakeTokenPort,
                 new FakeAuthPort(true),
-                new FakeSecurityPort()
+                new FakeSecurityPort(),
+                authMetrics
         );
     }
 
@@ -118,7 +122,8 @@ class RefreshTokenUseCaseHandlerTest {
         handler = new RefreshTokenUseCaseHandler(
                 new FakeTokenPersistencePort(false, userId),
                 new FakeAuthPort(true),
-                new FakeSecurityPort()
+                new FakeSecurityPort(),
+                authMetrics
         );
 
         assertThatThrownBy(() -> handler.handle(buildInput("invalid-token")))
@@ -131,7 +136,8 @@ class RefreshTokenUseCaseHandlerTest {
         handler = new RefreshTokenUseCaseHandler(
                 new FakeTokenPersistencePort(true, userId),
                 new FakeAuthPort(false),
-                new FakeSecurityPort()
+                new FakeSecurityPort(),
+                authMetrics
         );
 
         assertThatThrownBy(() -> handler.handle(buildInput("valid-token")))

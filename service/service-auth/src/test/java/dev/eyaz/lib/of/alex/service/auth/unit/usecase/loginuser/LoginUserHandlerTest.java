@@ -5,6 +5,8 @@ import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginU
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.handler.LoginUserHandler;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserRefreshTokenPersistenceTokenPort;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.loginuser.port.LoginUserSecurityPort;
+import dev.eyaz.lib.of.alex.service.auth.infra.observability.AuthMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,12 +47,13 @@ class LoginUserHandlerTest {
     private FakeLoginUserSecurityPort fakeSecurityPort;
     private FakeLoginUserRefreshTokenPort fakeTokenPort;
     private LoginUserHandler handler;
+    private AuthMetrics authMetrics = new AuthMetrics(new SimpleMeterRegistry());
 
     @BeforeEach
     void setUp() {
         fakeSecurityPort = new FakeLoginUserSecurityPort();
         fakeTokenPort    = new FakeLoginUserRefreshTokenPort();
-        handler          = new LoginUserHandler(fakeSecurityPort, fakeTokenPort);
+        handler          = new LoginUserHandler(fakeSecurityPort, fakeTokenPort, authMetrics);
     }
 
     @Test

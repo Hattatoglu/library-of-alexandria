@@ -5,6 +5,8 @@ import dev.eyaz.lib.of.alex.service.auth.core.exception.UserAlreadyExistsExcepti
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.signupuser.handler.SignUpUser;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.signupuser.handler.SignUpUserHandler;
 import dev.eyaz.lib.of.alex.service.auth.domain.usecase.signupuser.port.SignUpUserPersistenceAuthPort;
+import dev.eyaz.lib.of.alex.service.auth.infra.observability.AuthMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,11 +56,12 @@ class SignUpUserHandlerTest {
 
     private FakeSignUpUserPersistenceAuthPort fakePort;
     private SignUpUserHandler handler;
+    private AuthMetrics authMetrics = new AuthMetrics(new SimpleMeterRegistry());
 
     @BeforeEach
     void setUp() {
         fakePort = new FakeSignUpUserPersistenceAuthPort(new HashSet<>(), new HashSet<>());
-        handler  = new SignUpUserHandler(fakePort);
+        handler  = new SignUpUserHandler(fakePort, authMetrics);
     }
 
     // ── Happy path ───────────────────────────────────────────────────────────
@@ -104,7 +107,7 @@ class SignUpUserHandlerTest {
     @DisplayName("Mevcut username ile kayıt → UserAlreadyExistsException fırlatılır")
     void shouldThrowWhenUsernameAlreadyExists() {
         fakePort = new FakeSignUpUserPersistenceAuthPort(Set.of("emre"), new HashSet<>());
-        handler  = new SignUpUserHandler(fakePort);
+        handler  = new SignUpUserHandler(fakePort, authMetrics);
 
         SignUpUser input = buildInput("emre", "new@example.com");
 
@@ -117,7 +120,7 @@ class SignUpUserHandlerTest {
     @DisplayName("Mevcut email ile kayıt → UserAlreadyExistsException fırlatılır")
     void shouldThrowWhenEmailAlreadyExists() {
         fakePort = new FakeSignUpUserPersistenceAuthPort(new HashSet<>(), Set.of("emre@example.com"));
-        handler  = new SignUpUserHandler(fakePort);
+        handler  = new SignUpUserHandler(fakePort, authMetrics);
 
         SignUpUser input = buildInput("newuser", "emre@example.com");
 
@@ -132,7 +135,7 @@ class SignUpUserHandlerTest {
         SignUpUser first  = handler.handle(buildInput("user1", "u1@example.com"));
 
         fakePort = new FakeSignUpUserPersistenceAuthPort(new HashSet<>(), new HashSet<>());
-        handler  = new SignUpUserHandler(fakePort);
+        handler  = new SignUpUserHandler(fakePort, authMetrics);
         SignUpUser second = handler.handle(buildInput("user2", "u2@example.com"));
 
         assertThat(first.getUserId()).isNotEqualTo(second.getUserId());

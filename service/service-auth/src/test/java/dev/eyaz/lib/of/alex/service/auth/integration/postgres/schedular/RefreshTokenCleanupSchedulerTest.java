@@ -1,7 +1,9 @@
 package dev.eyaz.lib.of.alex.service.auth.integration.postgres.schedular;
 
+import dev.eyaz.lib.of.alex.service.auth.infra.observability.AuthMetrics;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.repository.RefreshTokenRepository;
 import dev.eyaz.lib.of.alex.service.auth.infra.postgres.schedular.RefreshTokenCleanupScheduler;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,7 @@ class RefreshTokenCleanupSchedulerTest {
     @BeforeEach
     void setUp() {
         repository  = mock(RefreshTokenRepository.class);
-        scheduler   = new RefreshTokenCleanupScheduler(repository);
+        scheduler   = new RefreshTokenCleanupScheduler(repository, new AuthMetrics(new SimpleMeterRegistry()));
     }
 
     @Test
