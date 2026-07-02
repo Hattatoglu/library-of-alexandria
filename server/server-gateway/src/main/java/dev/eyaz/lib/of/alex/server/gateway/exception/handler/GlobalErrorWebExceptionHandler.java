@@ -1,7 +1,8 @@
-package dev.eyaz.lib.of.alex.server.gateway.exception;
+package dev.eyaz.lib.of.alex.server.gateway.exception.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.eyaz.lib.of.alex.server.gateway.actuator.GatewayMetrics;
+import dev.eyaz.lib.of.alex.server.gateway.exception.exceptions.GatewayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;

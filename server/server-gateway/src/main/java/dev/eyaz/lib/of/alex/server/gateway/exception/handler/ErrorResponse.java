@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.exception;
+package dev.eyaz.lib.of.alex.server.gateway.exception.handler;
 
 import java.time.Instant;
 
