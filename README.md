@@ -19,7 +19,7 @@ project runs out-of-the-box without any manual setup.
 - They are **not used anywhere outside this repository** and grant no access to any real system.
 - **Do not reuse them.** If you fork this project for anything beyond local experimentation,
   generate your own key pair and load it via environment variables or a secrets manager
-  (see [ADR-001](./service/service-auth/documents/adr/ADR-001-asymmetric-jwt-rs256.md)).
+  (see [ADR-001](./service/service-auth/documents/ADR/ADR-001-asymmetric-jwt-rs256.md)).
 - In a real production deployment, private keys must **never** be committed to source
   control — this repository deliberately trades that best practice for reproducibility,
   since the project's goal is portfolio/interview demonstration, not production deployment.

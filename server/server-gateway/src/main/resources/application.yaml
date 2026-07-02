@@ -1,0 +1,53 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: server-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+gateway:
+  auth:
+    service-auth-base-url: ${SERVICE_AUTH_BASE_URL:http://localhost:8080}
+    public-key-cache-ttl: 1h
+
+# --- Actuator / Prometheus (ADR-006) ---
+# WebFlux-compatible by default: Spring Boot detects a reactive web
+# application (spring-webflux present, spring-web MVC absent) and exposes
+# actuator endpoints via the reactive WebFluxEndpointHandlerMapping — no
+# additional configuration or servlet-based setup is needed here.
+management:
+  endpoints:
+    web:
+      exposure:
+        # Only expose what's needed. "env" and "beans" are deliberately
+        # excluded from web exposure — useful locally, but not something
+        # to leave open by default even in a portfolio project.
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      # Redis reactive health indicator is auto-configured by Spring Boot
+      # (spring-boot-starter-data-redis-reactive + actuator on the classpath)
+      # — no custom HealthIndicator needed for basic connectivity checks.
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# --- Structured logging (see LoggingConfig for MDC/Reactor Context wiring) ---
+logging:
+  pattern:
+    # correlationId comes from MDC, populated per-request by CorrelationIdWebFilter
+    # and propagated across the reactive chain via context-propagation (see LoggingConfig).
+    level: "%5p [correlationId=%X{correlationId:-none}]"
+  level:
+    root: INFO
+    dev.eyaz.lib.of.alex.server.gateway: DEBUG
+    reactor.netty: INFO

@@ -1,4 +1,4 @@
-# ADR-001: Refresh Token Revocation Strategy
+# ADR-006: Refresh Token Revocation Strategy
 
 **Status:** Accepted
 **Date:** 2026-07-01

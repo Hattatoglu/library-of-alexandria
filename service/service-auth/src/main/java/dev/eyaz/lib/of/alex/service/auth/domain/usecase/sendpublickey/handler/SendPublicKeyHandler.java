@@ -23,7 +23,7 @@ public class SendPublicKeyHandler implements UseCaseHandler<SendPublicKey> {
     public SendPublicKey handle(SendPublicKey usecase) {
         log.debug("action=public_key_requested");
         //to avoid complexity Algorithm parameter set as hardcoded.
-        usecase.setAlgorithm("RSA256");
+        usecase.setAlgorithm("RS256");
         return sendPublicKeySecurityPort.getPublicKey(usecase);
     }
 }
