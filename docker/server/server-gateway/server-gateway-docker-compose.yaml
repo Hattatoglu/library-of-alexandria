@@ -1,0 +1,12 @@
+services:
+  server-gateway:
+    image: server-gateway:latest
+    container_name: server-gateway
+    ports:
+      - "8081:8080"
+    networks:
+      - libofalex
+
+networks:
+  libofalex:
+    driver: bridge

@@ -1,0 +1,12 @@
+services:
+  server-insight:
+    container_name: server-insight
+    image: redislabs/redisinsight:0.9.90
+    ports:
+      - '8001:8001'
+    networks:
+      - libofalex
+
+networks:
+  libofalex:
+    driver: bridge

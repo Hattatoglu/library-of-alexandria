@@ -1,21 +1,57 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   application:
     name: server-gateway
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:server-redis}
       port: ${REDIS_PORT:6379}
 
 gateway:
   auth:
-    service-auth-base-url: ${SERVICE_AUTH_BASE_URL:http://localhost:8080}
+    service-auth-base-url: ${SERVICE_AUTH_BASE_URL:http://service-auth:8080}
     public-key-cache-ttl: 1h
   ratelimit:
     bucket-capacity: 100
     refill-window: 60s
+  routing:
+    routes:
+      - path-prefix: /register
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+#      - path-prefix: /catalog
+#        service-name: catalog
+#        base-url: ${CATALOG_BASE_URL:http://localhost:8082}
+#      - path-prefix: /loans
+#        service-name: loan
+#        base-url: ${LOAN_BASE_URL:http://localhost:8083}
+
+# --- Circuit breaker (ADR-009: count-based opening) ---
+# ADR-012: keyed by service name — each downstream service runs as a
+# single instance today, so service-level and instance-level circuit
+# breaking are equivalent. resilience4j-spring-boot3 auto-configures a
+# CircuitBreakerRegistry from this config and auto-registers its metrics
+# with Micrometer — no custom Java config needed for either.
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+    instances:
+      auth:
+        base-config: default
+#      catalog:
+#        base-config: default
+#      loan:
+#        base-config: default
 
 # --- Actuator / Prometheus (ADR-006) ---
 # WebFlux-compatible by default: Spring Boot detects a reactive web

@@ -1,7 +1,6 @@
 package dev.eyaz.lib.of.alex.server.gateway.key;
 
 import dev.eyaz.lib.of.alex.server.gateway.actuator.GatewayMetrics;
-import dev.eyaz.lib.of.alex.server.gateway.config.GatewayAuthProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

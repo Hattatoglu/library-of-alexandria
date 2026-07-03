@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.config;
+package dev.eyaz.lib.of.alex.server.gateway.key;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

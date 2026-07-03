@@ -32,7 +32,7 @@ class SendPublicKeyHandlerTest {
     void shouldHardcodeAlgorithmAsRSA256() {
         SendPublicKey result = handler.handle(new SendPublicKey());
 
-        assertThat(result.getAlgorithm()).isEqualTo("RSA256");
+        assertThat(result.getAlgorithm()).isEqualTo("RS256");
     }
 
     @Test

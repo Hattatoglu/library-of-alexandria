@@ -1,8 +1,7 @@
-package dev.eyaz.lib.of.alex.server.gateway.filter;
+package dev.eyaz.lib.of.alex.server.gateway.jwt;
 
 import dev.eyaz.lib.of.alex.server.gateway.actuator.GatewayMetrics;
 import dev.eyaz.lib.of.alex.server.gateway.exception.exceptions.JwtValidationException;
-import dev.eyaz.lib.of.alex.server.gateway.jwt.JwtValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
