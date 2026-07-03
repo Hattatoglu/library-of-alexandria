@@ -13,6 +13,9 @@ gateway:
   auth:
     service-auth-base-url: ${SERVICE_AUTH_BASE_URL:http://localhost:8080}
     public-key-cache-ttl: 1h
+  ratelimit:
+    bucket-capacity: 100
+    refill-window: 60s
 
 # --- Actuator / Prometheus (ADR-006) ---
 # WebFlux-compatible by default: Spring Boot detects a reactive web
