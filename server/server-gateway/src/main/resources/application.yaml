@@ -21,6 +21,7 @@ gateway:
       - public-path: /register
       - public-path: /login
       - public-path: /refresh
+      - public-path: /logout
   routing:
     routes:
       - path-prefix: /register
@@ -29,19 +30,19 @@ gateway:
       - path-prefix: /login
         service-name: service-auth
         base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
-#      - path-prefix: /catalog
-#        service-name: catalog
-#        base-url: ${CATALOG_BASE_URL:http://localhost:8082}
-#      - path-prefix: /loans
-#        service-name: loan
-#        base-url: ${LOAN_BASE_URL:http://localhost:8083}
+      - path-prefix: /refresh
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /logout
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /roles
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /searchuser
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
 
-# --- Circuit breaker (ADR-009: count-based opening) ---
-# ADR-012: keyed by service name — each downstream service runs as a
-# single instance today, so service-level and instance-level circuit
-# breaking are equivalent. resilience4j-spring-boot3 auto-configures a
-# CircuitBreakerRegistry from this config and auto-registers its metrics
-# with Micrometer — no custom Java config needed for either.
 resilience4j:
   circuitbreaker:
     configs:
@@ -54,18 +55,9 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 3
         automatic-transition-from-open-to-half-open-enabled: true
     instances:
-      auth:
+      service-auth:
         base-config: default
-#      catalog:
-#        base-config: default
-#      loan:
-#        base-config: default
 
-# --- Actuator / Prometheus (ADR-006) ---
-# WebFlux-compatible by default: Spring Boot detects a reactive web
-# application (spring-webflux present, spring-web MVC absent) and exposes
-# actuator endpoints via the reactive WebFluxEndpointHandlerMapping — no
-# additional configuration or servlet-based setup is needed here.
 management:
   server:
     port: 9080
@@ -84,12 +76,7 @@ management:
       export:
         enabled: true
 
-# --- Structured logging (see LoggingConfig for MDC/Reactor Context wiring) ---
 logging:
-  pattern:
-    # correlationId comes from MDC, populated per-request by CorrelationIdWebFilter
-    # and propagated across the reactive chain via context-propagation (see LoggingConfig).
-    level: "%5p [correlationId=%X{correlationId:-none}]"
   level:
     root: INFO
     dev.eyaz.lib.of.alex.server.gateway: DEBUG

@@ -10,7 +10,7 @@ public record PublicPathProperties(
 ) {
     public boolean isPublic(String path) {
         return paths != null && paths.stream().anyMatch(
-                publicPath -> path.startsWith(publicPath.publicPath()));
+                publicPath -> path.equals(publicPath.publicPath()) || path.startsWith(publicPath.publicPath() + "/"));
     }
 }
 
