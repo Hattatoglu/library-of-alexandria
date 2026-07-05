@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.ratelimiter;
+package dev.eyaz.lib.of.alex.server.gateway.filter.ratelimiter;
 
 import dev.eyaz.lib.of.alex.server.gateway.actuator.GatewayMetrics;
 import org.slf4j.Logger;
@@ -34,6 +34,11 @@ public class RateLimitingWebFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+
+        if (exchange.getRequest().getPath().value().startsWith("/actuator")) {
+            return chain.filter(exchange);
+        }
+
         String rateLimitKey = resolveRateLimitKey(exchange);
 
         return rateLimitDecision.isAllowed(rateLimitKey)

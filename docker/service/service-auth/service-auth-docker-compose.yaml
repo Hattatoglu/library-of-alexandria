@@ -4,6 +4,7 @@ services:
     container_name: service-auth
     ports:
       - "8080:8080"
+      - "9080:9080"
     networks:
       - libofalex
 

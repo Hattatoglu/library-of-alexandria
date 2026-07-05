@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.jwt;
+package dev.eyaz.lib.of.alex.server.gateway.filter.jwt;
 
 import dev.eyaz.lib.of.alex.server.gateway.exception.exceptions.GatewayException;
 import dev.eyaz.lib.of.alex.server.gateway.exception.exceptions.JwtValidationException;

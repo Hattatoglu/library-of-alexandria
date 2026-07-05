@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.routing;
+package dev.eyaz.lib.of.alex.server.gateway.filter.routing;
 
 /**
  * A single routing rule (FR1): requests whose path starts with pathPrefix

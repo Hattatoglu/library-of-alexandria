@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.jwt;
+package dev.eyaz.lib.of.alex.server.gateway.filter.jwt;
 
 import java.util.List;
 

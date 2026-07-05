@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.routing;
+package dev.eyaz.lib.of.alex.server.gateway.filter.routing;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

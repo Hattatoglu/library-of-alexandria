@@ -26,26 +26,26 @@ public class CookieProvider {
 
         long accessMaxAge  = jwtProperties.accessTokenExpirationMs() / 1000;
         long refreshMaxAge = jwtProperties.refreshTokenExpirationMs() / 1000;
-        ResponseCookie access = buildCookie(CookieProperties.ACCESS_TOKEN_NAME, accessToken, accessMaxAge);
+        ResponseCookie access = buildCookie(CookieProperties.ACCESS_TOKEN_NAME, accessToken, "/", accessMaxAge);
         response.addHeader("Set-Cookie", access.toString());
 
-        ResponseCookie refresh = buildCookie(CookieProperties.REFRESH_TOKEN_NAME, refreshToken, refreshMaxAge);
+        ResponseCookie refresh = buildCookie(CookieProperties.REFRESH_TOKEN_NAME, refreshToken, "/auth", refreshMaxAge);
         response.addHeader("Set-Cookie", refresh.toString());
 
     }
 
     public void clearAuthCookies(HttpServletResponse response) {
-        response.addHeader("Set-Cookie", buildCookie(CookieProperties.ACCESS_TOKEN_NAME, "", 0).toString());
-        response.addHeader("Set-Cookie", buildCookie(CookieProperties.REFRESH_TOKEN_NAME, "", 0).toString());
+        response.addHeader("Set-Cookie", buildCookie(CookieProperties.ACCESS_TOKEN_NAME, "", "/",0).toString());
+        response.addHeader("Set-Cookie", buildCookie(CookieProperties.REFRESH_TOKEN_NAME, "", "/auth", 0).toString());
     }
 
-    private ResponseCookie buildCookie(String name, String value, long maxAgeSeconds) {
+    private ResponseCookie buildCookie(String name, String value, String path, long maxAgeSeconds) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(cookieProperties.secure())
                 .sameSite(cookieProperties.sameSite())
                 .domain(cookieProperties.domain())
-                .path("/")
+                .path(path)
                 .maxAge(Duration.ofSeconds(maxAgeSeconds))
                 .build();
     }

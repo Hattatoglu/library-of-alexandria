@@ -1,7 +1,10 @@
 package dev.eyaz.lib.of.alex.service.auth.infra.security.config;
 
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,10 +28,7 @@ public class SecurityConfig {
             "/api/v1/auth/login",
             "/api/v1/auth/logout",
             "/api/v1/auth/refresh",
-            "/api/v1/auth/public-key",
-            "/api/v1/auth/searchuser",
-            "/api/v1/auth/roles",
-            "/actuator/health"
+            "/api/v1/auth/public-key"
     };
 
     @Bean
@@ -41,6 +41,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .build();
+    }
+
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher(EndpointRequest.toAnyEndpoint())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .csrf(csrf -> csrf.disable());
+        return http.build();
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.jwt;
+package dev.eyaz.lib.of.alex.server.gateway.filter.jwt;
 
 import dev.eyaz.lib.of.alex.server.gateway.actuator.GatewayMetrics;
 import dev.eyaz.lib.of.alex.server.gateway.exception.exceptions.JwtValidationException;
@@ -36,14 +36,21 @@ public class JwtValidationWebFilter implements WebFilter {
 
     private final JwtValidator jwtValidator;
     private final GatewayMetrics gatewayMetrics;
+    private final PublicPathProperties publicPathProperties;
 
-    public JwtValidationWebFilter(JwtValidator jwtValidator, GatewayMetrics gatewayMetrics) {
+    public JwtValidationWebFilter(JwtValidator jwtValidator, GatewayMetrics gatewayMetrics, PublicPathProperties publicPathProperties) {
         this.jwtValidator = jwtValidator;
         this.gatewayMetrics = gatewayMetrics;
+        this.publicPathProperties = publicPathProperties;
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        String path = exchange.getRequest().getPath().value();
+        if(publicPathProperties.isPublic(path) || path.startsWith("/actuator")) {
+            return chain.filter(exchange);
+        }
+
         HttpCookie cookie = exchange.getRequest().getCookies().getFirst("access_token");
 
         if (cookie == null) {

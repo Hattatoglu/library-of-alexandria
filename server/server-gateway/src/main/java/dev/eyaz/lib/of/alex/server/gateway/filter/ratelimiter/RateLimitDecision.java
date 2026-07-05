@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.ratelimiter;
+package dev.eyaz.lib.of.alex.server.gateway.filter.ratelimiter;
 
 import reactor.core.publisher.Mono;
 

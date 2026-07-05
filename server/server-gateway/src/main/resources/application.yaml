@@ -16,9 +16,17 @@ gateway:
   ratelimit:
     bucket-capacity: 100
     refill-window: 60s
+  security:
+    paths:
+      - public-path: /register
+      - public-path: /login
+      - public-path: /refresh
   routing:
     routes:
       - path-prefix: /register
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /login
         service-name: service-auth
         base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
 #      - path-prefix: /catalog
@@ -59,19 +67,15 @@ resilience4j:
 # actuator endpoints via the reactive WebFluxEndpointHandlerMapping — no
 # additional configuration or servlet-based setup is needed here.
 management:
+  server:
+    port: 9080
   endpoints:
     web:
       exposure:
-        # Only expose what's needed. "env" and "beans" are deliberately
-        # excluded from web exposure — useful locally, but not something
-        # to leave open by default even in a portfolio project.
-        include: health, info, prometheus
+        include: health, info, prometheus, metrics
   endpoint:
     health:
       show-details: when-authorized
-      # Redis reactive health indicator is auto-configured by Spring Boot
-      # (spring-boot-starter-data-redis-reactive + actuator on the classpath)
-      # — no custom HealthIndicator needed for basic connectivity checks.
   metrics:
     tags:
       application: ${spring.application.name}

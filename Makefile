@@ -10,6 +10,12 @@ server-redis:
 server-insight:
 	docker compose -f docker/server/redis/server-insight-docker-compose.yaml -p libofalex up -d
 
+server-grafana:
+	docker compose -f docker/server/server-grafana/server-grafana-docker-compose.yaml -p libofalex up -d
+
+server-prometheus:
+	docker compose -f docker/server/server-prometheus/server-prometheus-docker-compose.yaml -p libofalex up -d
+
 server-adminer:
 	docker compose -f docker/server/postgres/server-adminer-docker-compose.yaml -p libofalex up -d
 

@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.routing;
+package dev.eyaz.lib.of.alex.server.gateway.filter.routing;
 
 import dev.eyaz.lib.of.alex.server.gateway.exception.exceptions.CircuitOpenException;
 import dev.eyaz.lib.of.alex.server.gateway.exception.exceptions.DownstreamUnavailableException;
@@ -75,11 +75,15 @@ public class RoutingWebFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getPath().value();
 
+        if (path.startsWith("/actuator")) {
+            return chain.filter(exchange);
+        }
+
         RouteConfig route = resolveRoute(path);
         if (route == null) {
             return Mono.error(new NoRouteFoundException(path));
         }
-        log.debug("Routing request: path={}, service={}, target={}", path, route.serviceName(), route.baseUrl() + path + queryStringOrEmpty(exchange));
+        log.info("Routing request: path={}, service={}, target={}", path, route.serviceName(), route.baseUrl() + path + queryStringOrEmpty(exchange));
 
         CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(route.serviceName());
 
@@ -89,6 +93,8 @@ public class RoutingWebFilter implements WebFilter {
                 .headers(headers -> headers.addAll(exchange.getRequest().getHeaders()))
                 .body(BodyInserters.fromDataBuffers(exchange.getRequest().getBody()))
                 .exchangeToMono(Mono::just);
+
+        log.info("downstream call : " + downstreamCall.toString());
 
         return downstreamCall
                 .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))

@@ -1,4 +1,4 @@
-package dev.eyaz.lib.of.alex.server.gateway.ratelimiter;
+package dev.eyaz.lib.of.alex.server.gateway.filter.ratelimiter;
 
 import dev.eyaz.lib.of.alex.server.gateway.actuator.GatewayMetrics;
 import org.slf4j.Logger;
