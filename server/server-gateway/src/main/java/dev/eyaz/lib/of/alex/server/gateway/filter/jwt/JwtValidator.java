@@ -21,6 +21,7 @@ public class JwtValidator {
 
     public JwtValidator(PublicKeyProvider publicKeyProvider) {
         this.publicKeyProvider = publicKeyProvider;
+        Jwts.parser().build();
     }
 
     public Mono<AuthenticatedUser> validate(String token) {

@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
@@ -22,37 +22,26 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-/**
- * Last filter in the chain (after JwtValidationWebFilter and
- * RateLimitingWebFilter): resolves the target downstream service from the
- * path (FR1), protects the call with that service's circuit breaker
- * (ADR-009/ADR-004: count-based opening, configured per-service in
- * application.yml), and forwards the request/response as a reactive proxy.
- *
- * ADR-012: circuit breaker check happens as part of the single downstream
- * call below because there is currently only ONE static instance per
- * service — service-level and instance-level circuit breaking are
- * equivalent in that state. Deliberately NOT building a load balancer or
- * per-instance circuit breaker yet: ADR-012 explicitly documents that as
- * unnecessary complexity while only one instance exists, and specifies the
- * exact future change (load balancer instance selection BEFORE the circuit
- * breaker check, one breaker per instance instead of one per service) to
- * apply only once a service is actually deployed with multiple instances.
- *
- * WHY CircuitBreakerOperator INSTEAD OF MANUAL STATE CHECK: calling
- * circuitBreaker.getState() to decide whether to proceed, THEN making the
- * call, would be a check-then-act race — the same bug class already seen
- * in this project (service-auth's refresh token collision, the rate
- * limiter's token bucket). CircuitBreakerOperator.of(cb) instead wraps the
- * call itself: Resilience4j atomically decides whether to permit it, and
- * automatically records the outcome (success/failure/rejected) against the
- * breaker's own state — no separate check step exists to race against.
- */
+import java.util.Set;
+
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 2)
 public class RoutingWebFilter implements WebFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(RoutingWebFilter.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(RoutingWebFilter.class);
+
+    private static final Set<String> HOP_BY_HOP_HEADERS = Set.of(
+            "Connection",
+            "Keep-Alive",
+            "Proxy-Authenticate",
+            "Proxy-Authorization",
+            "TE",
+            "Trailer",
+            "Transfer-Encoding",
+            "Upgrade",
+            "Content-Length"
+    );
 
     private final RoutingProperties routingProperties;
     private final CircuitBreakerRegistry circuitBreakerRegistry;
@@ -65,61 +54,157 @@ public class RoutingWebFilter implements WebFilter {
     ) {
         this.routingProperties = routingProperties;
         this.circuitBreakerRegistry = circuitBreakerRegistry;
-        // No baseUrl here on purpose: routes target different downstream
-        // services with different base URLs (resolved per-request below),
-        // unlike the ServiceAuth-specific WebClient bean in WebClientConfig.
+
+        /*
+         * No fixed baseUrl:
+         * each route dynamically targets a different downstream service.
+         */
         this.webClient = webClientBuilder.build();
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        String path = exchange.getRequest().getPath().value();
+    public Mono<Void> filter(
+            ServerWebExchange exchange,
+            WebFilterChain chain
+    ) {
+
+        String path = exchange.getRequest()
+                .getPath()
+                .value();
 
         if (path.startsWith("/actuator")) {
             return chain.filter(exchange);
         }
 
         RouteConfig route = resolveRoute(path);
+
         if (route == null) {
             return Mono.error(new NoRouteFoundException(path));
         }
-        log.info("Routing request: path={}, service={}, target={}", path, route.serviceName(), route.baseUrl() + path + queryStringOrEmpty(exchange));
 
-        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(route.serviceName());
+        String targetUrl =
+                route.baseUrl()
+                        + path
+                        + queryStringOrEmpty(exchange);
 
-        Mono<ClientResponse> downstreamCall = webClient
+        log.info(
+                "Routing request: path={}, service={}, target={}",
+                path,
+                route.serviceName(),
+                targetUrl
+        );
+
+        CircuitBreaker circuitBreaker =
+                circuitBreakerRegistry.circuitBreaker(
+                        route.serviceName()
+                );
+
+        return webClient
                 .method(exchange.getRequest().getMethod())
-                .uri(route.baseUrl() + path + queryStringOrEmpty(exchange))
-                .headers(headers -> headers.addAll(exchange.getRequest().getHeaders()))
-                .body(BodyInserters.fromDataBuffers(exchange.getRequest().getBody()))
-                .exchangeToMono(Mono::just);
-
-        log.info("downstream call : " + downstreamCall.toString());
-
-        return downstreamCall
+                .uri(targetUrl)
+                .headers(headers -> copyRequestHeaders(exchange, headers))
+                .body(exchange.getRequest().getBody(), DataBuffer.class)
+                .exchangeToMono(clientResponse ->
+                        forwardResponse(exchange, clientResponse))
                 .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
-                .flatMap(clientResponse -> forwardResponse(exchange, clientResponse))
-                .onErrorMap(CallNotPermittedException.class,
-                        ex -> new CircuitOpenException(route.serviceName()))
-                .onErrorMap(ex -> !(ex instanceof GatewayException),
-                        ex -> new DownstreamUnavailableException(route.serviceName(), ex));
+                .onErrorMap(
+                        CallNotPermittedException.class,
+                        ex -> new CircuitOpenException(
+                                route.serviceName()
+                        )
+                )
+                .onErrorMap(
+                        ex -> !(ex instanceof GatewayException),
+                        ex -> new DownstreamUnavailableException(
+                                route.serviceName(),
+                                ex
+                        )
+                );
     }
 
-    private Mono<Void> forwardResponse(ServerWebExchange exchange, ClientResponse clientResponse) {
-        exchange.getResponse().setStatusCode(clientResponse.statusCode());
-        exchange.getResponse().getHeaders().addAll(clientResponse.headers().asHttpHeaders());
-        return exchange.getResponse().writeWith(clientResponse.bodyToFlux(DataBuffer.class));
+    private Mono<Void> forwardResponse(
+            ServerWebExchange exchange,
+            ClientResponse clientResponse
+    ) {
+
+        exchange.getResponse()
+                .setStatusCode(clientResponse.statusCode());
+
+        copyResponseHeaders(clientResponse, exchange);
+
+        /*
+         * Stream downstream response body directly to the client
+         * without buffering the entire payload in memory.
+         */
+        return exchange.getResponse()
+                .writeWith(
+                        clientResponse.bodyToFlux(DataBuffer.class)
+                );
+    }
+
+    private void copyRequestHeaders(
+            ServerWebExchange exchange,
+            HttpHeaders targetHeaders
+    ) {
+
+        exchange.getRequest()
+                .getHeaders()
+                .forEach((name, values) -> {
+
+                    if (isForwardableRequestHeader(name)) {
+                        targetHeaders.put(name, values);
+                    }
+                });
+    }
+
+    private void copyResponseHeaders(
+            ClientResponse clientResponse,
+            ServerWebExchange exchange
+    ) {
+
+        clientResponse.headers()
+                .asHttpHeaders()
+                .forEach((name, values) -> {
+
+                    if (isForwardableResponseHeader(name)) {
+                        exchange.getResponse()
+                                .getHeaders()
+                                .put(name, values);
+                    }
+                });
+    }
+
+    private boolean isForwardableRequestHeader(String headerName) {
+
+        return HOP_BY_HOP_HEADERS.stream()
+                .noneMatch(h -> h.equalsIgnoreCase(headerName))
+                && !headerName.equalsIgnoreCase("Host");
+    }
+
+    private boolean isForwardableResponseHeader(String headerName) {
+
+        return HOP_BY_HOP_HEADERS.stream()
+                .noneMatch(h -> h.equalsIgnoreCase(headerName));
     }
 
     private RouteConfig resolveRoute(String path) {
-        return routingProperties.routes().stream()
+
+        return routingProperties.routes()
+                .stream()
                 .filter(route -> path.startsWith(route.pathPrefix()))
                 .findFirst()
                 .orElse(null);
     }
 
     private String queryStringOrEmpty(ServerWebExchange exchange) {
-        String query = exchange.getRequest().getURI().getRawQuery();
-        return query != null ? "?" + query : "";
+
+        String query =
+                exchange.getRequest()
+                        .getURI()
+                        .getRawQuery();
+
+        return query != null
+                ? "?" + query
+                : "";
     }
 }

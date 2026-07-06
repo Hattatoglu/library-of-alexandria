@@ -60,8 +60,7 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
                 status.value(),
                 errorCode,
                 safeMessage(ex),
-                exchange.getRequest().getPath().value(),
-                MDC.get("correlationId")
+                exchange.getRequest().getPath().value()
         );
 
         gatewayMetrics.recordError(errorCode, status.value());

@@ -13,10 +13,9 @@ public record ErrorResponse(
         int status,
         String errorCode,
         String message,
-        String path,
-        String correlationId
+        String path
 ) {
-    public static ErrorResponse of(int status, String errorCode, String message, String path, String correlationId) {
-        return new ErrorResponse(Instant.now(), status, errorCode, message, path, correlationId);
+    public static ErrorResponse of(int status, String errorCode, String message, String path) {
+        return new ErrorResponse(Instant.now(), status, errorCode, message, path);
     }
 }

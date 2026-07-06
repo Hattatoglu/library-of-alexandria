@@ -6,7 +6,7 @@ spring:
     name: server-gateway
   data:
     redis:
-      host: ${REDIS_HOST:server-redis}
+      host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
 
 gateway:
@@ -60,7 +60,7 @@ resilience4j:
 
 management:
   server:
-    port: 9080
+    port: 9081
   endpoints:
     web:
       exposure:
