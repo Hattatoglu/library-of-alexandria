@@ -10,7 +10,7 @@ gateway:
     service-auth-base-url: http://placeholder   # overridden at runtime by @DynamicPropertySource
     public-key-cache-ttl: 5m
   ratelimit:
-    bucket-capacity: 100
+    bucket-capacity: 5
     refill-window: 60s
   security:
     paths:
