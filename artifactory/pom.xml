@@ -16,6 +16,8 @@
     <description>this module contains libs that uses by server or services</description>
     <modules>
         <module>lib-domain</module>
+        <module>lib-infra-web</module>
+        <module>lib-db-postgres</module>
     </modules>
 
 </project>

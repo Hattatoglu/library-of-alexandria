@@ -1,0 +1,14 @@
+services:
+  grafana:
+    image: grafana/grafana:12.2
+    container_name: server-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - libofalex
+
+networks:
+  libofalex:
+    driver: bridge

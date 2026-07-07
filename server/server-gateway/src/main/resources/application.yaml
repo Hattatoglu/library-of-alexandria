@@ -1,0 +1,83 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: server-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+
+gateway:
+  auth:
+    service-auth-base-url: ${SERVICE_AUTH_BASE_URL:http://service-auth:8080}
+    public-key-cache-ttl: 1h
+  ratelimit:
+    bucket-capacity: 100
+    refill-window: 60s
+  security:
+    paths:
+      - public-path: /register
+      - public-path: /login
+      - public-path: /refresh
+      - public-path: /logout
+  routing:
+    routes:
+      - path-prefix: /register
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /login
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /refresh
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /logout
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /roles
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+      - path-prefix: /searchuser
+        service-name: service-auth
+        base-url: ${AUTH_BASE_URL:http://service-auth:8080/api/v1/auth}
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+    instances:
+      service-auth:
+        base-config: default
+
+management:
+  server:
+    port: 9081
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    dev.eyaz.lib.of.alex.server.gateway: DEBUG
+    reactor.netty: INFO

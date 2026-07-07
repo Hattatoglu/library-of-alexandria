@@ -1,0 +1,23 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ServiceAuth
+    participant AuthDB
+
+
+    User                ->>  ServiceAuth:   HTTP POST http://service-auth/api/v1/auth/logout<br/>with X-User-Id header
+    ServiceAuth         ->>  AuthDB     :   find refresh token by token
+    alt Token Not Found
+        AuthDB          -->> ServiceAuth:   null
+        ServiceAuth     -->> User       :   HTTP 204 No Content (idempotent)
+    else Token
+        AuthDB          -->> ServiceAuth:   RefreshTokenEntity
+        ServiceAuth     ->>  ServiceAuth:   token.userId == X-User-Id ?
+        alt Unsuccessfull
+            ServiceAuth -->> User       :   HTTP 403 Forbidden
+        else Successfull
+            ServiceAuth ->>  AuthDB     :   delete token
+            AuthDB      -->> ServiceAuth:   ok
+            ServiceAuth -->> User       :   HTTP 204 No Content
+        end
+    end

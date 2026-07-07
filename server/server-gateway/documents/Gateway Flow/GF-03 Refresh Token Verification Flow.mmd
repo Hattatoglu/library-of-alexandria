@@ -1,0 +1,24 @@
+%% Reflects ADR-001: refresh token is opaque (SecureRandom-generated) and
+%% DB-backed, not a self-verifying JWT. Its validity is determined entirely
+%% by ServiceAuth looking up the corresponding row — there is no signature
+%% to verify at the Gateway and no Redis blacklist involved.
+sequenceDiagram
+    autonumber
+    actor User
+    participant Gateway
+    participant ServiceAuth
+    participant DB
+
+    User            ->>  Gateway        :   HTTP POST http://server-gateway/refresh <br/>RefreshTokenRequest
+    Gateway         ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/auth/refresh <br/>RefreshTokenRequest
+    ServiceAuth     ->>  DB             :   SELECT refresh_token WHERE token = ?
+    DB              -->> ServiceAuth    :   result
+    alt Not found / expired
+        ServiceAuth -->> Gateway        :   HTTP 401 Unauthorized
+        Gateway     -->> User           :   HTTP 401 Unauthorized
+    else Found and valid
+        ServiceAuth ->>  DB             :   DELETE old refresh_token row (rotation)
+        ServiceAuth ->>  DB             :   INSERT new refresh_token row
+        ServiceAuth -->> Gateway        :   HTTP 200 OK RefreshTokenResponse <br/>(new access + refresh token)
+        Gateway     -->> User           :   HTTP 200 OK RefreshTokenResponse
+    end

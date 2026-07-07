@@ -1,0 +1,17 @@
+services:
+  prometheus:
+    image: prom/prometheus:v3.13.0
+    container_name: server-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      # Exposed to host for convenience while developing (browsing the
+      # Prometheus UI / querying directly). Scraping itself only needs the
+      # internal network — this port is not required for that to work.
+      - "9090:9090"
+    networks:
+      - libofalex
+
+networks:
+  libofalex:
+    driver: bridge

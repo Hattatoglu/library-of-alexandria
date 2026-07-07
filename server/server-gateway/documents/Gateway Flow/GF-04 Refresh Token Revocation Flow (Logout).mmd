@@ -1,0 +1,17 @@
+%% Reflects ADR-001: this diagram is repurposed from the old "blacklist on
+%% rotation" flow. Rotation itself is now shown inline in GF-03 (delete +
+%% insert on refresh). This diagram covers the other revocation trigger:
+%% explicit logout. No Redis is involved — DB deletion is the revocation.
+sequenceDiagram
+    autonumber
+    actor User
+    participant Gateway
+    participant ServiceAuth
+    participant DB
+
+    User            ->>  Gateway        :   HTTP POST http://server-gateway/logout <br/>(with Refresh Token)
+    Gateway         ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/auth/logout <br/>LogoutRequest
+    ServiceAuth     ->>  DB             :   DELETE FROM refresh_token WHERE token = ?
+    DB              -->> ServiceAuth    :   ok (idempotent — no error if already deleted)
+    ServiceAuth     -->> Gateway        :   HTTP 200 OK
+    Gateway         -->> User           :   HTTP 200 OK

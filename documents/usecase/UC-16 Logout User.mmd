@@ -1,0 +1,24 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Nginx
+    participant Gateway
+    participant ServiceAuth
+    participant AuthDB
+
+    Note over User,AuthDB: User has already logged in
+
+    User            ->>  Nginx          :   HTTP POST http://libofalex.com/logout (with Access Token cookie)
+    Nginx           ->>  Gateway        :   HTTP POST http://server-gateway/logout (with Access Token cookie)
+    Gateway         ->>  Gateway        :   verify Access Token
+    alt Invalid Access Token
+        Gateway     -->> Nginx          :   HTTP 401 Unauthorized
+        Nginx       -->> User           :   HTTP 401 Unauthorized
+    else Valid Access
+        Note over Gateway               :   X-User-Id header injection
+        Gateway     ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/auth/logout
+        Note over ServiceAuth: REF: SF-06 Logout User Internal Flow
+        ServiceAuth -->> Gateway        :   HTTP 204 No Content
+        Gateway     -->> Nginx          :   HTTP 204 No Content
+        Nginx       -->> User           :   HTTP 204 No Content
+    end

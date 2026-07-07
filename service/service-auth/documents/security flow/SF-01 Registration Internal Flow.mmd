@@ -1,0 +1,18 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ServiceAuth
+    participant AuthDB
+
+    User            ->>  ServiceAuth    :   HTTP POST http://service-auth/api/v1/auth/register \nCreateUserRequest
+    ServiceAuth     ->>  AuthDB         :   check email and username
+    alt email or username available in db
+        AuthDB      -->> ServiceAuth    :   AuthEntity
+        ServiceAuth -->> User           :   HTTP 409 Conflict
+    else Not Found
+        AuthDB          -->> ServiceAuth    :   not found
+        ServiceAuth     ->>  ServiceAuth    :   hash password (BCrypt)
+        ServiceAuth     ->>  AuthDB         :   save AuthEntity
+        AuthDB          -->> ServiceAuth    :   saved AuthEntity
+        ServiceAuth     -->> User           :   HTTP 200 OK CreateUserResponse
+    end

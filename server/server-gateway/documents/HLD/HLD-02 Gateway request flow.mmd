@@ -1,0 +1,35 @@
+flowchart TD
+    Start(["Request arrives at Gateway"]) --> ReadToken["Read access_token<br/>from HttpOnly cookie"]
+
+    ReadToken --> TokenPresent{"Token present?"}
+    TokenPresent -->|No| Return401A["Return 401 Unauthorized"]
+    TokenPresent -->|Yes| ValidateSig["Validate JWT signature<br/>(RSA public key, cached)"]
+
+    ValidateSig --> SigValid{"Signature valid<br/>and not expired?"}
+    SigValid -->|No| Return401B["Return 401 Unauthorized"]
+    SigValid -->|Yes| ExtractClaims["Extract user claims<br/>(sub, role)"]
+
+    ExtractClaims --> RateCheck["Check rate limit<br/>(Redis token bucket, per user)"]
+    RateCheck --> RateOk{"Within limit?"}
+    RateOk -->|No| Return429["Return 429 Too Many Requests<br/>+ Retry-After header"]
+    RateOk -->|Yes| ResolveRoute["Resolve target service<br/>from path prefix"]
+
+    ResolveRoute --> CircuitState{"Circuit breaker state<br/>for target service?"}
+    CircuitState -->|OPEN| Return503["Return 503 Service Unavailable<br/>(fail fast, no downstream call)"]
+    CircuitState -->|CLOSED or HALF_OPEN| PickInstance["Load balancer selects instance<br/>(round robin, static config)"]
+
+    PickInstance --> AddHeaders["Add X-User-Id, X-User-Role<br/>headers"]
+    AddHeaders --> Forward["Forward request via WebClient"]
+
+    Forward --> DownstreamResult{"Downstream response?"}
+    DownstreamResult -->|Success| RecordSuccess["Record success<br/>(circuit breaker)"]
+    DownstreamResult -->|Failure / timeout| RecordFailure["Record failure<br/>(circuit breaker)"]
+
+    RecordSuccess --> ReturnResponse["Return downstream response to client"]
+    RecordFailure --> ReturnErrorResponse["Return error response to client"]
+
+    style Return401A fill:#7f1d1d,color:#fef2f2
+    style Return401B fill:#7f1d1d,color:#fef2f2
+    style Return429 fill:#78350f,color:#fef3c7
+    style Return503 fill:#7f1d1d,color:#fef2f2
+    style ReturnResponse fill:#14532d,color:#f0fdf4
