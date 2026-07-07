@@ -14,7 +14,7 @@
     <name>server-gateway</name>
     <packaging>jar</packaging>
     <description>library of alexandria application gateway module</description>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
