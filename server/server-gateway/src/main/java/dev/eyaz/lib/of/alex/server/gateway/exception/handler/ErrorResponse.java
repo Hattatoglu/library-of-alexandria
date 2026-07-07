@@ -9,13 +9,13 @@ import java.time.Instant;
  * the error.
  */
 public record ErrorResponse(
-        Instant timestamp,
+        String timestamp,
         int status,
         String errorCode,
         String message,
         String path
 ) {
     public static ErrorResponse of(int status, String errorCode, String message, String path) {
-        return new ErrorResponse(Instant.now(), status, errorCode, message, path);
+        return new ErrorResponse(Instant.now().toString(), status, errorCode, message, path);
     }
 }
