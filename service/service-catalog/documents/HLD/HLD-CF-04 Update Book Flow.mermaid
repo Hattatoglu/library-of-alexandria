@@ -1,0 +1,29 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ServiceCatalog
+    participant CatalogDB
+    participant Kafka
+
+    User           ->>  ServiceCatalog      :   HTTP PUT http://service-catalog/api/v1/books/{bookId} <br/>UpdateBookRequest
+    ServiceCatalog ->>  CatalogDB           :   findBookById
+    alt Not Found
+        CatalogDB      -->> ServiceCatalog  :   Null
+        ServiceCatalog -->> User            :   HTTP 404 Not Found
+    else BookEntity
+        CatalogDB      -->> ServiceCatalog  :   BookEntity
+        ServiceCatalog ->>  ServiceCatalog  :   validate requested status transition<br/>(state machine — see open question)
+        alt Invalid status transition
+            ServiceCatalog -->> User        :   HTTP 409 Conflict
+        else Valid update
+            ServiceCatalog ->>  CatalogDB   :   UPDATE book
+            CatalogDB      -->> ServiceCatalog : ok
+            alt Status field changed
+                ServiceCatalog ->>  Kafka   :   publish BookStatusChangedEvent <br/>(bookId, oldStatus, newStatus)
+                Kafka          -->> ServiceCatalog : ack
+            else Status unchanged (e.g. only title/author edited)
+                ServiceCatalog ->>  ServiceCatalog : no event published
+            end
+            ServiceCatalog -->> User        :   HTTP 200 OK UpdateBookResponse
+        end
+    end

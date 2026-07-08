@@ -1,0 +1,32 @@
+graph TB
+    Client["Client"]
+    Gateway["API Gateway"]
+
+    subgraph ServiceCatalog["service-catalog (Spring MVC, Hexagonal)"]
+        direction TB
+        API["REST API<br/>(Add / Remove / Update Book)"]
+        Domain["Domain<br/>(Book, BookStatus state machine)"]
+        Persistence["Persistence Adapter"]
+        KafkaProducer["Kafka Producer Adapter"]
+    end
+
+    CatalogDB[("CatalogDB<br/>(PostgreSQL)")]
+    Kafka[("Kafka<br/>(book-status-events topic)")]
+
+    ServiceLoan["service-loan<br/>(future — Kafka consumer)"]
+    ServiceNotifier["service-notifier<br/>(future — not in scope now)"]
+
+    Client --> Gateway
+    Gateway -->|"/catalog/**"| API
+    API --> Domain
+    Domain --> Persistence
+    Persistence --> CatalogDB
+    Domain -->|"on status change"| KafkaProducer
+    KafkaProducer --> Kafka
+    Kafka -.->|"consume"| ServiceLoan
+    Kafka -.->|"consume (later)"| ServiceNotifier
+
+    style ServiceCatalog fill:#1e293b,stroke:#64748b,color:#f1f5f9
+    style Kafka fill:#3f2d1e,stroke:#d97706,color:#fef3c7
+    style ServiceLoan fill:#1e3a5f,stroke:#3b82f6,color:#eff6ff,stroke-dasharray: 5 5
+    style ServiceNotifier fill:#1e3a5f,stroke:#3b82f6,color:#eff6ff,stroke-dasharray: 5 5

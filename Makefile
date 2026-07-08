@@ -31,3 +31,8 @@ build-server-gateway: maven
 server-gateway:
 	docker compose -f docker/server/server-gateway/server-gateway-docker-compose.yaml -p libofalex up -d
 
+server-kafka:
+	docker compose -f docker/server/server-kafka/server-kafka-docker-compose.yaml -p libofalex up -d
+
+server-kafka-ui:
+	docker compose -f docker/server/server-kafka/server-kafka-ui-docker-compose.yaml -p libofalex up -d
