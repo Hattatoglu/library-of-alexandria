@@ -8,12 +8,12 @@
 
 ## Context
 
-`service-catalog` currently produces a single event type (`BookStatusChangedEvent`), but more event types are anticipated as the system grows (e.g., a future `BookAddedEvent` or `BookMetadataUpdatedEvent`, should status-change and general-update events ever need to be distinguished more finely than they are today). Two Kafka topic design patterns were considered:
+`service-catalog` currently produces a single event type (`BookStatusChangedEvent`), but more event types are anticipated as the system grows (e.g., a future `BookAddedEvent` or `BookMetadataUpdatedEvent`, should bookStatus-change and general-update events ever need to be distinguished more finely than they are today). Two Kafka topic design patterns were considered:
 
-- **One topic per event type** — e.g., `book-status-changed-events`, `book-added-events`, each carrying a single, narrowly-typed event.
+- **One topic per event type** — e.g., `book-bookStatus-changed-events`, `book-added-events`, each carrying a single, narrowly-typed event.
 - **One topic per aggregate/entity, with an event-type discriminator field** — a single `book-events` topic carrying all event types about a book, each message tagged with an `eventType` field.
 
-The deciding factor is Kafka's ordering guarantee: messages are only guaranteed to be delivered in order **within a single partition of a single topic**. If events about the same book are split across multiple topics, a consumer (`service-loan`, later `service-notifier`) cannot rely on receiving them in the order they were produced — e.g., a status-change event could theoretically be processed before the corresponding book's initial creation event, if they live in separate topics with independent consumer lag.
+The deciding factor is Kafka's ordering guarantee: messages are only guaranteed to be delivered in order **within a single partition of a single topic**. If events about the same book are split across multiple topics, a consumer (`service-loan`, later `service-notifier`) cannot rely on receiving them in the order they were produced — e.g., a bookStatus-change event could theoretically be processed before the corresponding book's initial creation event, if they live in separate topics with independent consumer lag.
 
 ## Decision
 
@@ -28,7 +28,7 @@ The deciding factor is Kafka's ordering guarantee: messages are only guaranteed 
 
 **Negative / Accepted limitations:**
 - Consumers must filter/branch on the `eventType` field themselves rather than relying on topic subscription to pre-filter event types — a minor complexity shifted from topic configuration to consumer code, considered a reasonable tradeoff for the ordering guarantee gained.
-- All consumers of `book-events` receive all event types, even ones they don't care about (e.g., a hypothetical consumer only interested in status changes still receives every event type on the topic) — acceptable at the current scale (one event type today, a small number anticipated).
+- All consumers of `book-events` receive all event types, even ones they don't care about (e.g., a hypothetical consumer only interested in bookStatus changes still receives every event type on the topic) — acceptable at the current scale (one event type today, a small number anticipated).
 
 ## Alternatives Considered
 

@@ -8,7 +8,7 @@
 
 ## Context
 
-`service-catalog` owns a book's **base status** — `AVAILABLE`, `MAINTENANCE`, `LOST`, `REMOVED` — distinct from borrow/return status, which belongs entirely to `service-loan`'s domain (see ADR-003). The dedicated status-change endpoint (ADR-005) needs a defined set of rules for which status transitions are valid.
+`service-catalog` owns a book's **base bookStatus** — `AVAILABLE`, `MAINTENANCE`, `LOST`, `REMOVED` — distinct from borrow/return bookStatus, which belongs entirely to `service-loan`'s domain (see ADR-003). The dedicated bookStatus-change endpoint (ADR-005) needs a defined set of rules for which bookStatus transitions are valid.
 
 Two specific transition questions were raised and answered:
 - Can `REMOVED` transition back to `AVAILABLE`? — **Yes** (a book can be soft-deleted in error and restored).
@@ -18,7 +18,7 @@ Both answers remove what would otherwise have been restrictions in a stricter st
 
 ## Decision
 
-**Any base status may transition directly to any other base status.** There is no restricted state machine graph — `AVAILABLE`, `MAINTENANCE`, `LOST`, and `REMOVED` form a fully-connected set of valid transitions. The status-change endpoint's "validate status transition" step (BF-05) is reduced to: the requested status is a valid enum value, and it differs from the current status (a no-op transition is rejected or treated as idempotent — see open question below).
+**Any base bookStatus may transition directly to any other base bookStatus.** There is no restricted state machine graph — `AVAILABLE`, `MAINTENANCE`, `LOST`, and `REMOVED` form a fully-connected set of valid transitions. The bookStatus-change endpoint's "validate bookStatus transition" step (BF-05) is reduced to: the requested bookStatus is a valid enum value, and it differs from the current bookStatus (a no-op transition is rejected or treated as idempotent — see open question below).
 
 ## Consequences
 
@@ -27,7 +27,7 @@ Both answers remove what would otherwise have been restrictions in a stricter st
 - Matches real-world messiness of library operations: a "lost" book can turn up during a maintenance check (`LOST` → `MAINTENANCE`), a removed record can be restored the moment someone realizes it was deleted by mistake (`REMOVED` → `AVAILABLE`) — modeling every such real scenario as a "valid transition" is easier than trying to anticipate and encode which ones are supposedly impossible.
 
 **Negative / Accepted limitations:**
-- No system-level guardrail against a nonsensical rapid sequence of changes (e.g., `AVAILABLE` → `LOST` → `AVAILABLE` → `MAINTENANCE` in quick succession) — any such misuse is a data-entry/process concern, not something `service-catalog` enforces technically. Accepted because the base-status set is small and each status is independently meaningful (unlike, say, an order-fulfillment state machine where sequence genuinely matters for correctness).
+- No system-level guardrail against a nonsensical rapid sequence of changes (e.g., `AVAILABLE` → `LOST` → `AVAILABLE` → `MAINTENANCE` in quick succession) — any such misuse is a data-entry/process concern, not something `service-catalog` enforces technically. Accepted because the base-bookStatus set is small and each bookStatus is independently meaningful (unlike, say, an order-fulfillment state machine where sequence genuinely matters for correctness).
 
 ## Alternatives Considered
 
@@ -37,7 +37,7 @@ Both answers remove what would otherwise have been restrictions in a stricter st
 
 ## Open Question (not blocking, deferred to implementation)
 
-Should setting a status to its **current** value (e.g., `AVAILABLE` → `AVAILABLE`) be treated as a no-op success (200, no event published) or rejected (409, "no change requested")? This is a minor API-contract detail, not an architectural one — to be resolved when the request/response DTOs are defined.
+Should setting a bookStatus to its **current** value (e.g., `AVAILABLE` → `AVAILABLE`) be treated as a no-op success (200, no event published) or rejected (409, "no change requested")? This is a minor API-contract detail, not an architectural one — to be resolved when the request/response DTOs are defined.
 
 ## Revisit Triggers
 

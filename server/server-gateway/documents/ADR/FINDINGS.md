@@ -19,7 +19,7 @@ Both example filters follow the same shape on the failure path:
 exchange.getResponse().setStatusCode(...);
 return exchange.getResponse().setComplete();
 ```
-Forgetting `setComplete()` is the most common bug here — the status code is set but the response is never actually committed, and the client hangs. The second `JwtValidationWebFilterTest` test makes this failure mode explicit by asserting `chain.filter()` is never invoked on the failure path — this is the kind of bug that a manual smoke test might not catch (a hung connection under low load can look like a slow response, not a bug).
+Forgetting `setComplete()` is the most common bug here — the bookStatus code is set but the response is never actually committed, and the client hangs. The second `JwtValidationWebFilterTest` test makes this failure mode explicit by asserting `chain.filter()` is never invoked on the failure path — this is the kind of bug that a manual smoke test might not catch (a hung connection under low load can look like a slow response, not a bug).
 
 ## Rule 3 — Atomicity for check-then-act patterns must be pushed into Redis itself, not composed client-side
 

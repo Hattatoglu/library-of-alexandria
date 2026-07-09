@@ -36,3 +36,9 @@ server-kafka:
 
 server-kafka-ui:
 	docker compose -f docker/server/server-kafka/server-kafka-ui-docker-compose.yaml -p libofalex up -d
+
+build-service-catalog: maven
+	docker build -f docker/service/service-catalog/Dockerfile -t service-catalog:latest .
+
+service-catalog:
+	docker compose -f docker/service/service-catalog/service-catalog-docker-compose.yaml -p libofalex up -d

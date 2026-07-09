@@ -1,8 +1,10 @@
 package dev.eyaz.lib.of.alex.service.catalog.domain.usecase.addbook.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCase;
+import dev.eyaz.lib.of.alex.service.catalog.core.enums.BookStatus;
 import dev.eyaz.lib.of.alex.service.catalog.core.enums.BookType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,10 +17,13 @@ public class AddBook implements UseCase {
     private String isbn;
     private String bookName;
     private String author;
-    private String publishYear;
+    private int publishYear;
     private BookType bookType;
     private boolean bc;
-    private boolean available;
+    private BookStatus bookStatus;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 
     public AddBook() {}
 
@@ -71,11 +76,11 @@ public class AddBook implements UseCase {
         this.author = author;
     }
 
-    public String getPublishYear() {
+    public int getPublishYear() {
         return publishYear;
     }
 
-    public void setPublishYear(String publishYear) {
+    public void setPublishYear(int publishYear) {
         this.publishYear = publishYear;
     }
 
@@ -95,11 +100,28 @@ public class AddBook implements UseCase {
         this.bc = bc;
     }
 
-    public boolean isAvailable() {
-        return available;
+
+    public BookStatus getStatus() {
+        return bookStatus;
     }
 
-    public void setAvailable(boolean available) {
-        this.available = available;
+    public void setStatus(BookStatus bookStatus) {
+        this.bookStatus = bookStatus;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

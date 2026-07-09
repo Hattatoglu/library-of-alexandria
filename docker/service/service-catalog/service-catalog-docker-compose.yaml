@@ -1,0 +1,13 @@
+services:
+  service-catalog:
+    image: service-catalog:latest
+    container_name: service-catalog
+    ports:
+      - "8080:8080"
+      - "9081:9080"
+    networks:
+      - libofalex
+
+networks:
+  libofalex:
+    driver: bridge

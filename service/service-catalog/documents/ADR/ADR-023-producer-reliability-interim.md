@@ -8,7 +8,7 @@
 
 ## Context
 
-The `CatalogDB` write (status update) and the Kafka publish (`BookStatusChangedEvent`) are two separate operations, not atomic with each other. Two designs were considered:
+The `CatalogDB` write (bookStatus update) and the Kafka publish (`BookStatusChangedEvent`) are two separate operations, not atomic with each other. Two designs were considered:
 
 1. **Simple post-commit publish:** write to `CatalogDB`, then publish to Kafka as a best-effort follow-up step. If the Kafka publish fails after the DB commit succeeds, the event is lost — `service-loan`'s view silently falls out of sync with `service-catalog`'s actual state until some other event for the same book happens to correct it (or never, if no further changes occur).
 2. **Transactional Outbox Pattern:** write the event to an outbox table in the *same* database transaction as the entity update (atomic by construction, since it's a single DB transaction), with a separate poller/CDC process reliably publishing outbox rows to Kafka, retrying until acknowledged. This closes the consistency gap entirely, at the cost of an outbox table, a poller/scheduler process, and its own deep dive to implement correctly.
@@ -39,7 +39,7 @@ The `CatalogDB` write (status update) and the Kafka publish (`BookStatusChangedE
 
 The intended path, planned for the future (not tied to a specific hard deadline):
 
-1. Introduce an outbox table (e.g., `book_event_outbox`), written to in the same transaction as the book/status update.
+1. Introduce an outbox table (e.g., `book_event_outbox`), written to in the same transaction as the book/bookStatus update.
 2. Add a poller (or adopt a CDC tool such as Debezium) that reads unpublished outbox rows and publishes them to Kafka, marking them published only on broker acknowledgment.
 3. Retire the direct post-commit publish call in favor of the outbox-driven publish.
 

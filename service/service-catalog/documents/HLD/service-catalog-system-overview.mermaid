@@ -11,7 +11,7 @@ graph TB
     end
 
     CatalogDB[("CatalogDB<br/>(PostgreSQL)")]
-    Kafka[("Kafka<br/>(book-status-events topic)")]
+    Kafka[("Kafka<br/>(book-bookStatus-events topic)")]
 
     ServiceLoan["service-loan<br/>(future — Kafka consumer)"]
     ServiceNotifier["service-notifier<br/>(future — not in scope now)"]
@@ -21,7 +21,7 @@ graph TB
     API --> Domain
     Domain --> Persistence
     Persistence --> CatalogDB
-    Domain -->|"on status change"| KafkaProducer
+    Domain -->|"on bookStatus change"| KafkaProducer
     KafkaProducer --> Kafka
     Kafka -.->|"consume"| ServiceLoan
     Kafka -.->|"consume (later)"| ServiceNotifier

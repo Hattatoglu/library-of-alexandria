@@ -1,28 +1,31 @@
 package dev.eyaz.lib.of.alex.service.catalog.domain.usecase.addbook.handler;
 
 import dev.eyaz.lib.of.alex.artifactory.lib.domain.usecase.UseCaseHandler;
+import dev.eyaz.lib.of.alex.service.catalog.core.enums.BookStatus;
 import dev.eyaz.lib.of.alex.service.catalog.core.exception.InsufficientRoleException;
-import dev.eyaz.lib.of.alex.service.catalog.domain.usecase.addbook.port.AddBookNewBookAddedBookEventPort;
+import dev.eyaz.lib.of.alex.service.catalog.domain.usecase.addbook.port.AddBookUsecaseNewBookAddedEventOutboxPort;
 import dev.eyaz.lib.of.alex.service.catalog.domain.usecase.addbook.port.AddBookPersistenceBookPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class AddBookHandler implements UseCaseHandler<AddBook> {
 
     private static final Logger log = LoggerFactory.getLogger(AddBookHandler.class);
     Set<String> validRoles = Set.of("SUPER", "ADMIN");
 
     private final AddBookPersistenceBookPort addBookPersistenceBookPort;
-    private final AddBookNewBookAddedBookEventPort addBookNewBookAddedBookEventPort;
+    private final AddBookUsecaseNewBookAddedEventOutboxPort addBookUsecaseNewBookAddedEventOutboxPort;
 
-    public AddBookHandler(AddBookPersistenceBookPort addBookPersistenceBookPort, AddBookNewBookAddedBookEventPort addBookNewBookAddedBookEventPort) {
+    public AddBookHandler(AddBookPersistenceBookPort addBookPersistenceBookPort, AddBookUsecaseNewBookAddedEventOutboxPort addBookUsecaseNewBookAddedEventOutboxPort) {
         this.addBookPersistenceBookPort = addBookPersistenceBookPort;
-        this.addBookNewBookAddedBookEventPort = addBookNewBookAddedBookEventPort;
+        this.addBookUsecaseNewBookAddedEventOutboxPort = addBookUsecaseNewBookAddedEventOutboxPort;
     }
 
     @Override
@@ -49,6 +52,7 @@ public class AddBookHandler implements UseCaseHandler<AddBook> {
 
     private AddBook initiateBook(AddBook usecase) {
         usecase.setBookId(UUID.randomUUID());
+        usecase.setStatus(BookStatus.AVAILABLE);
         return usecase;
     }
 
@@ -57,7 +61,7 @@ public class AddBookHandler implements UseCaseHandler<AddBook> {
     }
 
     private AddBook publishNewBookAddedEvent(AddBook usecase) {
-        return addBookNewBookAddedBookEventPort.fireNewBookAddedEvent(usecase);
+        return addBookUsecaseNewBookAddedEventOutboxPort.fireNewBookAddedEvent(usecase);
     }
 
 }

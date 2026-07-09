@@ -18,6 +18,10 @@
         <module>lib-domain</module>
         <module>lib-infra-web</module>
         <module>lib-db-postgres</module>
+        <module>lib-kafka-model</module>
+        <module>lib-kafka-producer</module>
+        <module>lib-kafka-consumer</module>
+        <module>lib-outbox</module>
     </modules>
 
 </project>

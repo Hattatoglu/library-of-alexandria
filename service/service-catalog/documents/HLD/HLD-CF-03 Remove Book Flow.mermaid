@@ -12,13 +12,13 @@ sequenceDiagram
         ServiceCatalog -->> User            :   HTTP 404 Not Found
     else BookEntity
         CatalogDB      -->> ServiceCatalog  :   BookEntity
-        ServiceCatalog ->>  ServiceCatalog  :   check current status<br/>(e.g. cannot remove while BORROWED — TBD, see open question)
+        ServiceCatalog ->>  ServiceCatalog  :   check current bookStatus<br/>(e.g. cannot remove while BORROWED — TBD, see open question)
         alt Removal not allowed
             ServiceCatalog -->> User        :   HTTP 409 Conflict
         else Removal allowed
             ServiceCatalog ->>  CatalogDB   :   DELETE book (or soft-delete — TBD)
             CatalogDB      -->> ServiceCatalog : ok
-            ServiceCatalog ->>  Kafka       :   publish BookStatusChangedEvent <br/>(bookId, status=REMOVED)
+            ServiceCatalog ->>  Kafka       :   publish BookStatusChangedEvent <br/>(bookId, bookStatus=REMOVED)
             Kafka          -->> ServiceCatalog : ack
             ServiceCatalog -->> User        :   HTTP 200 OK
         end

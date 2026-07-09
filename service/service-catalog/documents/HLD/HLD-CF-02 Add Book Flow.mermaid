@@ -6,9 +6,9 @@ sequenceDiagram
     participant Kafka
 
     User           ->>  ServiceCatalog      :   HTTP POST http://service-catalog/api/v1/books <br/>AddBookRequest
-    ServiceCatalog ->>  ServiceCatalog      :   validate request, assign initial status (AVAILABLE)
+    ServiceCatalog ->>  ServiceCatalog      :   validate request, assign initial bookStatus (AVAILABLE)
     ServiceCatalog ->>  CatalogDB           :   INSERT book
     CatalogDB      -->> ServiceCatalog      :   ok
-    ServiceCatalog ->>  Kafka               :   publish BookStatusChangedEvent <br/>(bookId, status=AVAILABLE)
+    ServiceCatalog ->>  Kafka               :   publish BookStatusChangedEvent <br/>(bookId, bookStatus=AVAILABLE)
     Kafka          -->> ServiceCatalog      :   ack
     ServiceCatalog -->> User                :   HTTP 201 Created AddBookResponse

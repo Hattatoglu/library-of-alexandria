@@ -15,7 +15,7 @@ sequenceDiagram
         alt Wrong Status
             ServiceCatalog -->> User        :   HTTP 409 Conflict
         else Correct Status
-            ServiceCatalog ->>  CatalogDB   :   update borrow status
+            ServiceCatalog ->>  CatalogDB   :   update borrow bookStatus
             CatalogDB      -->> ServiceCatalog : ok
             ServiceCatalog -->> User        :   HTTP 200 OK BorrowBookResponse
         end

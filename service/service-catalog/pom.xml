@@ -32,6 +32,16 @@
             <artifactId>lib-infra-web</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>dev.eyaz.lib.of.alex.artifactory.lib.kafka.model.service.catalog.event</groupId>
+            <artifactId>service-catalog-event</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.eyaz.lib.of.alex.artifactory.lib.outbox</groupId>
+            <artifactId>lib-outbox</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <!-->Spring jpa dependencies<-->
         <dependency>

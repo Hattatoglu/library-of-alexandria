@@ -23,8 +23,8 @@ This document defines **what** service-catalog will do. The reasoning **behind**
 
 ## Explicitly Out of Scope for service-catalog
 
-- **Book search / listing** — owned by service-loan, which maintains its own read-model combining catalog data with live loan status (see ADR-003). service-catalog only exposes detail lookup (`GET /books/{id}`) for drill-down.
-- **Borrow / return status management** — entirely service-loan's domain. service-catalog only owns the book's *base* status (AVAILABLE, MAINTENANCE, LOST, REMOVED).
+- **Book search / listing** — owned by service-loan, which maintains its own read-model combining catalog data with live loan bookStatus (see ADR-003). service-catalog only exposes detail lookup (`GET /books/{id}`) for drill-down.
+- **Borrow / return bookStatus management** — entirely service-loan's domain. service-catalog only owns the book's *base* bookStatus (AVAILABLE, MAINTENANCE, LOST, REMOVED).
 - **User notifications** — planned for a future `service-notifier` service, out of scope here.
 
 ## Non-Functional Requirements (Next Step)
@@ -33,7 +33,7 @@ This document covers functional requirements only. The following should be addre
 
 - Latency budget for CRUD operations
 - Availability target
-- Observability / metrics requirements (Kafka publish failure count, status-change frequency, etc.)
+- Observability / metrics requirements (Kafka publish failure count, bookStatus-change frequency, etc.)
 - CatalogDB backup/retention policy for soft-deleted (`REMOVED`) records
 
 ## Architecture Decisions (Resolved via ADR)
@@ -43,9 +43,9 @@ This document covers functional requirements only. The following should be addre
 | 1 | Architecture style | Hexagonal (ports-and-adapters) — see ADR-001 |
 | 2 | Web stack | Spring MVC, blocking — see ADR-002 |
 | 3 | Dependency on service-loan | None synchronous — event-driven only via Kafka — see ADR-003 |
-| 4 | Book removal | Soft delete (status → REMOVED) — see ADR-004 |
+| 4 | Book removal | Soft delete (bookStatus → REMOVED) — see ADR-004 |
 | 5 | Status change API shape | Dedicated endpoint, separate from general update — see ADR-005 |
-| 6 | Status transition rules | Unrestricted — any status to any status — see ADR-006 |
+| 6 | Status transition rules | Unrestricted — any bookStatus to any bookStatus — see ADR-006 |
 | 7 | Kafka topic design | Single topic (`book-events`), `bookId` partition key, `eventType` discriminator — see ADR-007 |
 | 8 | Producer reliability | Simple post-commit publish (interim); Transactional Outbox planned for later — see ADR-008 |
 | — | Message broker (system-wide) | Kafka — see system ADR-001 |
