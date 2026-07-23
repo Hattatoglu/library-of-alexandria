@@ -59,6 +59,7 @@ public class JwtValidationWebFilter implements WebFilter {
 
         return jwtValidator.validate(cookie.getValue())
                 .flatMap(user -> {
+                    log.info("Authentication user : {}", user.toString());
                     ServerWebExchange mutatedExchange = exchange.mutate()
                             .request(builder -> builder
                                     .header("X-User-Id", user.userId())

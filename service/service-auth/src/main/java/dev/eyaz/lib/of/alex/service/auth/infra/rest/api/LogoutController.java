@@ -7,6 +7,8 @@ import dev.eyaz.lib.of.alex.service.auth.infra.security.config.CookieProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,8 @@ import java.util.UUID;
 @RequestMapping("/api/v1/auth")
 public class LogoutController {
 
+    private static final Logger log = LoggerFactory.getLogger(LogoutController.class);
+
     private final UseCaseHandler<LogoutUser> useCaseHandler;
     private final CookieProvider cookieProvider;
 
@@ -30,12 +34,13 @@ public class LogoutController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request,
                                         HttpServletResponse response) {
-
+//        String userId = request.getHeader("X-User-Id");
         String refreshToken = extractCookieValue(request);
-        String userId = request.getHeader("X-User-Id");
+
+        log.info("logout refresh token : " + refreshToken );
 
         LogoutUser usecase = new LogoutUser();
-        usecase.setUserId(UUID.fromString(userId));
+//        usecase.setUserId(UUID.fromString(userId));
         usecase.setRefreshToken(refreshToken);
 
         LogoutUser answer = useCaseHandler.handle(usecase);

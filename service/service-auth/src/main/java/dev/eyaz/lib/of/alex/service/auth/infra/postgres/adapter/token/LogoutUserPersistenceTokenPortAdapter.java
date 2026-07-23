@@ -38,12 +38,12 @@ public class LogoutUserPersistenceTokenPortAdapter implements LogoutUserPersiste
 
         RefreshTokenEntity entity = optional.get();
 
-        if (!entity.getUserId().equals(useCase.getUserId())) {
-            authMetrics.incrementLogoutFailureTokenMismatch();
-            log.warn("action=logout_token_owner_mismatch requestedUserId={} tokenOwnerId={}",
-                    useCase.getUserId(), entity.getUserId());
-            throw new InvalidTokenException("Token does not belong to the requesting user");
-        }
+//        if (!entity.getUserId().equals(useCase.getUserId())) {
+//            authMetrics.incrementLogoutFailureTokenMismatch();
+//            log.warn("action=logout_token_owner_mismatch requestedUserId={} tokenOwnerId={}",
+//                    useCase.getUserId(), entity.getUserId());
+//            throw new InvalidTokenException("Token does not belong to the requesting user");
+//        }
 
         refreshTokenRepository.delete(entity);
         return useCase;

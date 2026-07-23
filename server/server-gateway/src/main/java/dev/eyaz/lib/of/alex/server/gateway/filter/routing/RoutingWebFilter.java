@@ -88,10 +88,11 @@ public class RoutingWebFilter implements WebFilter {
                         + queryStringOrEmpty(exchange);
 
         log.info(
-                "Routing request: path={}, service={}, target={}",
+                "Routing request: path={}, service={}, target={}, headers= {}",
                 path,
                 route.serviceName(),
-                targetUrl
+                targetUrl,
+                exchange.getRequest().getHeaders()
         );
 
         CircuitBreaker circuitBreaker =
